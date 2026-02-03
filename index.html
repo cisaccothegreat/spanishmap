@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spanish Verb Conjugation Mind Map</title>
+    <title>Interactive Spanish Verb Mind Map</title>
     <style>
         * {
             margin: 0;
@@ -13,837 +13,829 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-            overflow-x: auto;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        h1 {
-            text-align: center;
-            color: white;
-            margin-bottom: 30px;
-            font-size: 2.5em;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .mind-map {
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            gap: 40px;
-            flex-wrap: wrap;
-        }
-
-        .central-node {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-            padding: 30px 40px;
-            border-radius: 50%;
-            font-size: 1.5em;
-            font-weight: bold;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            text-align: center;
-            min-width: 250px;
-            min-height: 250px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: transform 0.3s ease;
-            margin: 20px;
-        }
-
-        .central-node:hover {
-            transform: scale(1.05);
-        }
-
-        .branches {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            width: 100%;
-        }
-
-        .branch {
-            background: white;
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .branch:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 40px rgba(0,0,0,0.3);
-        }
-
-        .branch-header {
-            padding: 15px;
-            border-radius: 12px;
-            color: white;
-            font-weight: bold;
-            font-size: 1.3em;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .toggle-icon {
-            font-size: 1.2em;
-            transition: transform 0.3s ease;
-        }
-
-        .toggle-icon.expanded {
-            transform: rotate(180deg);
-        }
-
-        .branch-content {
-            max-height: 0;
+            background: #0a0a0a;
             overflow: hidden;
-            transition: max-height 0.3s ease;
+            color: white;
         }
 
-        .branch-content.expanded {
-            max-height: 3000px;
+        #container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+            cursor: grab;
         }
 
-        .verb-section {
-            margin: 15px 0;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            border-left: 4px solid;
+        #container.dragging {
+            cursor: grabbing;
         }
 
-        .verb-title {
+        #canvas-wrapper {
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: transform 0.3s ease-out;
+        }
+
+        #canvas {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 4000px;
+            height: 4000px;
+            transform: translate(-50%, -50%);
+        }
+
+        svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: visible;
+        }
+
+        svg line {
+            stroke: rgba(255, 255, 255, 0.3);
+            stroke-width: 2;
+        }
+
+        /* Controls */
+        .controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .control-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        /* Title */
+        .title {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            font-size: 2em;
             font-weight: bold;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Node styles */
+        .node {
+            position: absolute;
+            padding: 15px 25px;
+            border-radius: 25px;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            white-space: nowrap;
+            user-select: none;
+            z-index: 10;
+        }
+
+        .node:hover {
+            transform: scale(1.05) translate(-50%, -50%);
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+            z-index: 20;
+        }
+
+        /* Center node */
+        .center-node {
+            font-size: 1.8em;
+            padding: 30px 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            min-width: 200px;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Tense nodes */
+        .tense-node {
+            font-size: 1.3em;
+        }
+
+        /* Category nodes (Regular/Irregular) */
+        .category-node {
             font-size: 1.1em;
-            margin-bottom: 10px;
+        }
+
+        .regular-node {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+
+        .irregular-node {
+            background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
+        }
+
+        /* Verb ending nodes */
+        .ending-node {
+            font-size: 1em;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        /* Irregular verb nodes */
+        .verb-node {
+            font-size: 0.95em;
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
             color: #333;
         }
 
-        .conjugation {
+        /* Conjugation detail box */
+        .conjugation-box {
+            position: fixed;
+            background: rgba(20, 20, 20, 0.95);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            min-width: 250px;
+            z-index: 1000;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+            display: none;
+        }
+
+        .conjugation-box.visible {
+            display: block;
+        }
+
+        .conjugation-box h3 {
+            margin-bottom: 15px;
+            color: #ffd700;
+            font-size: 1.2em;
+        }
+
+        .conjugation-list {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: auto auto;
             gap: 8px;
-            margin: 10px 0;
-            font-size: 0.95em;
+            font-size: 0.9em;
         }
 
         .pronoun {
-            color: #666;
-            font-weight: 500;
+            color: #888;
         }
 
         .verb-form {
-            color: #333;
+            color: #fff;
             font-weight: bold;
         }
 
-        /* Tense-specific colors */
-        .presente { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
-        .preterito { background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%); }
-        .imperfecto { background: linear-gradient(135deg, #fc4a1a 0%, #f7b733 100%); }
-        .perfecto { background: linear-gradient(135deg, #4776e6 0%, #8e54e9 100%); }
-        .pluscuamperfecto { background: linear-gradient(135deg, #134e5e 0%, #71b280 100%); }
-        .futuro { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
-        .condicional { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #333 !important; }
-        .subjuntivo { background: linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%); }
-
-        .presente-border { border-left-color: #11998e; }
-        .preterito-border { border-left-color: #ee0979; }
-        .imperfecto-border { border-left-color: #fc4a1a; }
-        .perfecto-border { border-left-color: #4776e6; }
-        .pluscuamperfecto-border { border-left-color: #134e5e; }
-        .futuro-border { border-left-color: #fa709a; }
-        .condicional-border { border-left-color: #a8edea; }
-        .subjuntivo-border { border-left-color: #8e2de2; }
-
-        .note {
-            background: #fff3cd;
-            padding: 10px;
-            border-radius: 8px;
-            margin-top: 10px;
-            font-size: 0.9em;
-            color: #856404;
-            border-left: 4px solid #ffc107;
-        }
-
-        /* Connection Box */
-        .connection-box {
-            grid-column: 1 / -1;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
             color: white;
-            margin: 20px 0;
+            cursor: pointer;
+            font-size: 16px;
         }
 
-        .connection-title {
-            font-size: 1.8em;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
         }
 
-        .connection-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .connection-card {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 20px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .connection-card h3 {
-            font-size: 1.3em;
-            margin-bottom: 15px;
-            color: #ffd700;
-        }
-
-        .example-sentence {
+        /* Instructions */
+        .instructions {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
             background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            border-radius: 10px;
-            margin: 10px 0;
-            line-height: 1.6;
-        }
-
-        .example-sentence .spanish {
-            font-size: 1.1em;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .example-sentence .english {
-            font-style: italic;
-            opacity: 0.9;
-        }
-
-        .formula {
-            background: rgba(255, 215, 0, 0.2);
-            padding: 15px;
-            border-radius: 10px;
-            border-left: 4px solid #ffd700;
-            font-weight: bold;
-            font-size: 1.1em;
-            margin: 15px 0;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 15px 30px;
+            font-size: 0.9em;
+            text-align: center;
+            z-index: 1000;
         }
 
         @media (max-width: 768px) {
-            h1 {
-                font-size: 1.8em;
+            .node {
+                font-size: 0.85em;
+                padding: 10px 15px;
             }
-            
-            .central-node {
-                min-width: 200px;
-                min-height: 200px;
+
+            .center-node {
                 font-size: 1.2em;
+                min-width: 150px;
+                min-height: 150px;
+                padding: 20px 30px;
             }
 
-            .conjugation {
-                grid-template-columns: 1fr;
-            }
-
-            .connection-content {
-                grid-template-columns: 1fr;
+            .instructions {
+                font-size: 0.8em;
+                padding: 10px 20px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🇪🇸 Spanish Verb Conjugation Mind Map 🇪🇸</h1>
-        
-        <div class="mind-map">
-            <div class="central-node" onclick="toggleAll()">
-                SPANISH<br>VERB<br>CONJUGATIONS<br>
-                <small style="font-size: 0.5em; margin-top: 10px;">Click branches to explore!</small>
-            </div>
-        </div>
+    <div class="title">🇪🇸 Spanish Verb Map</div>
 
-        <div class="branches">
-            <!-- PRESENTE -->
-            <div class="branch" onclick="toggleBranch('presente')">
-                <div class="branch-header presente">
-                    <span>PRESENTE (Present)</span>
-                    <span class="toggle-icon" id="icon-presente">▼</span>
-                </div>
-                <div class="branch-content" id="content-presente">
-                    <div class="verb-section presente-border">
-                        <div class="verb-title">Regular -AR: HABLAR (to speak)</div>
-                        <div class="conjugation">
-                            <span class="pronoun">yo</span><span class="verb-form">hablo</span>
-                            <span class="pronoun">tú</span><span class="verb-form">hablas</span>
-                            <span class="pronoun">él/ella/usted</span><span class="verb-form">habla</span>
-                            <span class="pronoun">nosotros/as</span><span class="verb-form">hablamos</span>
-                            <span class="pronoun">vosotros/as</span><span class="verb-form">habláis</span>
-                            <span class="pronoun">ellos/ellas/ustedes</span><span class="verb-form">hablan</span>
-                        </div>
-                    </div>
+    <div class="controls">
+        <button class="control-btn" onclick="zoomIn()">+</button>
+        <button class="control-btn" onclick="zoomOut()">−</button>
+        <button class="control-btn" onclick="resetView()">⟲</button>
+    </div>
 
-                    <div class="verb-section presente-border">
-                        <div class="verb-title">Regular -ER: COMER (to eat)</div>
-                        <div class="conjugation">
-                            <span class="pronoun">yo</span><span class="verb-form">como</span>
-                            <span class="pronoun">tú</span><span class="verb-form">comes</span>
-                            <span class="pronoun">él/ella/usted</span><span class="verb-form">come</span>
-                            <span class="pronoun">nosotros/as</span><span class="verb-form">comemos</span>
-                            <span class="pronoun">vosotros/as</span><span class="verb-form">coméis</span>
-                            <span class="pronoun">ellos/ellas/ustedes</span><span class="verb-form">comen</span>
-                        </div>
-                    </div>
+    <div class="instructions">
+        🖱️ Drag to move • 🖱️ Scroll to zoom • 🖱️ Click nodes to explore
+    </div>
 
-                    <div class="verb-section presente-border">
-                        <div class="verb-title">Regular -IR: VIVIR (to live)</div>
-                        <div class="conjugation">
-                            <span class="pronoun">yo</span><span class="verb-form">vivo</span>
-                            <span class="pronoun">tú</span><span class="verb-form">vives</span>
-                            <span class="pronoun">él/ella/usted</span><span class="verb-form">vive</span>
-                            <span class="pronoun">nosotros/as</span><span class="verb-form">vivimos</span>
-                            <span class="pronoun">vosotros/as</span><span class="verb-form">vivís</span>
-                            <span class="pronoun">ellos/ellas/ustedes</span><span class="verb-form">viven</span>
-                        </div>
-                    </div>
-
-                    <div class="verb-section presente-border">
-                        <div class="verb-title">Irregular: SER (to be)</div>
-                        <div class="conjugation">
-                            <span class="pronoun">yo</span><span class="verb-form">soy</span>
-                            <span class="pronoun">tú</span><span class="verb-form">eres</span>
-                            <span class="pronoun">él/ella/usted</span><span class="verb-form">es</span>
-                            <span class="pronoun">nosotros/as</span><span class="verb-form">somos</span>
-                            <span class="pronoun">vosotros/as</span><span class="verb-form">sois</span>
-                            <span class="pronoun">ellos/ellas/ustedes</span><span class="verb-form">son</span>
-                        </div>
-                    </div>
-
-                    <div class="verb-section presente-border">
-                        <div class="verb-title">Irregular: ESTAR (to be)</div>
-                        <div class="conjugation">
-                            <span class="pronoun">yo</span><span class="verb-form">estoy</span>
-                            <span class="pronoun">tú</span><span class="verb-form">estás</span>
-                            <span class="pronoun">él/ella/usted</span><span class="verb-form">está</span>
-                            <span class="pronoun">nosotros/as</span><span class="verb-form">estamos</span>
-                            <span class="pronoun">vosotros/as</span><span class="verb-form">estáis</span>
-                            <span class="pronoun">ellos/ellas/ustedes</span><span class="verb-form">están</span>
-                        </div>
-                    </div>
-
-                    <div class="note">💡 Use for habitual actions, current states, and general truths!</div>
-                </div>
-            </div>
-
-            <!-- PRETÉRITO -->
-            <div class="branch" onclick="toggleBranch('preterito')">
-                <div class="branch-header preterito">
-                    <span>PRETÉRITO (Preterite)</span>
-                    <span class="toggle-icon" id="icon-preterito">▼</span>
-                </div>
-                <div class="branch-content" id="content-preterito">
-                    <div class="verb-section preterito-border">
-                        <div class="verb-title">Regular -AR: HABLAR</div>
-                        <div class="conjugation">
-                            <span class="pronoun">yo</span><span class="verb-form">hablé</span>
-                            <span class="pronoun">tú</span><span class="verb-form">hablaste</span>
-                            <span class="pronoun">él/ella/usted</span><span class="verb-form">habló</span>
-                            <span class="pronoun">nosotros/as</span><span class="verb-form">hablamos</span>
-                            <span class="pronoun">vosotros/as</span><span class="verb-form">hablasteis</span>
-                            <span class="pronoun">ellos/ellas/ustedes</span><span class="verb-form">hablaron</span>
-                        </div>
-                    </div>
-
-                    <div class="verb-section preterito-border">
-                        <div class="verb-title">Regular -ER/-IR: COMER / VIVIR</div>
-                        <div class="conjugation">
-                            <span class="pronoun">yo</span><span class="verb-form">comí / viví</span>
-                            <span class="pronoun">tú</span><span class="verb-form">comiste / viviste</span>
-                            <span class="pronoun">él/ella/usted</span><span class="verb-form">comió / vivió</span>
-                            <span class="pronoun">nosotros/as</span><span class="verb-form">comimos / vivimos</span>
-                            <span class="pronoun">vosotros/as</span><span class="verb-form">comisteis / vivisteis</span>
-                            <span class="pronoun">ellos/ellas/ustedes</span><span class="verb-form">comieron / vivieron</span>
-                        </div>
-                    </div>
-
-                    <div class="verb-section preterito-border">
-                        <div class="verb-title">Irregular: SER/IR (same forms!)</div>
-                        <div class="conjugation">
-                            <span class="pronoun">yo</span><span class="verb-form">fui</span>
-                            <span class="pronoun">tú</span><span class="verb-form">fuiste</span>
-                            <span class="pronoun">él/ella/usted</span><span class="verb-form">fue</span>
-                            <span class="pronoun">nosotros/as</span><span class="verb-form">fuimos</span>
-                            <span class="pronoun">vosotros/as</span><span class="verb-form">fuisteis</span>
-                            <span class="pronoun">ellos/ellas/ustedes</span><span class="verb-form">fueron</span>
-                        </div>
-                    </div>
-
-                    <div class="verb-section preterito-border">
-                        <div class="verb-title">Irregular: HACER (to do/make)</div>
-                        <div class="conjugation">
-                            <span class="pronoun">yo</span><span class="verb-form">hice</span>
-                            <span class="pronoun">tú</span><span class="verb-form">hiciste</span>
-                            <span class="pronoun">él/ella/usted</span><span class="verb-form">hizo</span>
-                            <span class="pronoun">nosotros/as</span><span class="verb-form">hicimos</span>
-                            <span class="pronoun">vosotros/as</span><span class="verb-form">hicisteis</span>
-                            <span class="pronoun">ellos/ellas/ustedes</span><span class="verb-form">hicieron</span>
-                        </div>
-                    </div>
-
-                    <div class="note">💡 Use for completed actions in the past with specific timeframes!</div>
-                </div>
-            </div>
-
-            <!-- IMPERFECTO -->
-            <div class="branch" onclick="toggleBranch('imperfecto')">
-                <div class="branch-header imperfecto">
-                    <span>IMPERFECTO (Imperfect)</span>
-                    <span class="toggle-icon" id="icon-imperfecto">▼</span>
-                </div>
-                <div class="branch-content" id="content-imperfecto">
-                    <div class="verb-section imperfecto-border">
-                        <div class="verb-title">Regular -AR: HABLAR</div>
-                        <div class="conjugation">
-                            <span class="pronoun">yo</span><span class="verb-form">hablaba</span>
-                            <span class="pronoun">tú</span><span class="verb-form">hablabas</span>
-                            <span class="pronoun">él/ella/usted</span><span class="verb-form">hablaba</span>
-                            <span class="pronoun">nosotros/as</span><span class="verb-form">hablábamos</span>
-                            <span class="pronoun">vosotros/as</span><span class="verb-form">hablabais</span>
-                            <span class="pronoun">ellos/ellas/ustedes</span><span class="verb-form">hablaban</span>
-                        </div>
-                    </div>
-
-                    <div class="verb-section imperfecto-border">
-                        <div class="verb-title">Regular -ER/-IR: COMER / VIVIR</div>
-                        <div class="conjugation">
-                            <span class="pronoun">yo</span><span class="verb-form">comía / vivía</span>
-                            <span class="pronoun">tú</span><span class="verb-form">comías / vivías</span>
-                            <span class="pronoun">él/ella/usted</span><span class="verb-form">comía / vivía</span>
-                            <span class="pronoun">nosotros/as</span><span class="verb-form">comíamos / vivíamos</span>
-                            <span class="pronoun">vosotros/as</span><span class="verb-form">comíais / vivíais</span>
-                            <span class="pronoun">ellos/ellas/ustedes</span><span class="verb-form">comían / vivían</span>
-                        </div>
-                    </div>
-
-                    <div class="verb-section imperfecto-border">
-                        <div class="verb-title">Irregular: SER</div>
-                        <div class="conjugation">
-                            <span class="pronoun">yo</span><span class="verb-form">era</span>
-                            <span class="pronoun">tú</span><span class="verb-form">eras</span>
-                            <span class="pronoun">él/ella/usted</span><span class="verb-form">era</span>
-                            <span class="pronoun">nosotros/as</span><span class="verb-form">éramos</span>
-                            <span class="pronoun">vosotros/as</span><span class="verb-form">erais</span>
-                            <span class="pronoun">ellos/ellas/ustedes</span><span class="verb-form">eran</span>
-                        </div>
-                    </div>
-
-                    <div class="verb-section imperfecto-border">
-                        <div class="verb-title">Irregular: IR</div>
-                        <div class="conjugation">
-                            <span class="pronoun">yo</span><span class="verb-form">iba</span>
-                            <span class="pronoun">tú</span><span class="verb-form">ibas</span>
-                            <span class="pronoun">él/ella/usted</span><span class="verb-form">iba</span>
-                            <span class="pronoun">nosotros/as</span><span class="verb-form">íbamos</span>
-                            <span class="pronoun">vosotros/as</span><span class="verb-form">ibais</span>
-                            <span class="pronoun">ellos/ellas/ustedes</span><span class="verb-form">iban</span>
-                        </div>
-                    </div>
-
-                    <div class="note">💡 Use for ongoing/habitual past actions, descriptions, and background info!</div>
-                </div>
-            </div>
-
-            <!-- PRETÉRITO PERFECTO -->
-            <div class="branch" onclick="toggleBranch('perfecto')">
-                <div class="branch-header perfecto">
-                    <span>PRETÉRITO PERFECTO (Present Perfect)</span>
-                    <span class="toggle-icon" id="icon-perfecto">▼</span>
-                </div>
-                <div class="branch-content" id="content-perfecto">
-                    <div class="verb-section perfecto-border">
-                        <div class="verb-title">Formula: HABER (present) + past participle</div>
-                        <div class="conjugation">
-                            <span class="pronoun">yo</span><span class="verb-form">he hablado/comido/vivido</span>
-                            <span class="pronoun">tú</span><span class="verb-form">has hablado/comido/vivido</span>
-                            <span class="pronoun">él/ella/usted</span><span class="verb-form">ha hablado/comido/vivido</span>
-                            <span class="pronoun">nosotros/as</span><span class="verb-form">hemos hablado/comido/vivido</span>
-                            <span class="pronoun">vosotros/as</span><span class="verb-form">habéis hablado/comido/vivido</span>
-                            <span class="pronoun">ellos/ellas/ustedes</span><span class="verb-form">han hablado/comido/vivido</span>
-                        </div>
-                    </div>
-
-                    <div class="verb-section perfecto-border">
-                        <div class="verb-title">Irregular Past Participles</div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0;">
-                            <div><strong>hacer</strong> → hecho</div>
-                            <div><strong>ver</strong> → visto</div>
-                            <div><strong>decir</strong> → dicho</div>
-                            <div><strong>escribir</strong> → escrito</div>
-                            <div><strong>poner</strong> → puesto</div>
-                            <div><strong>volver</strong> → vuelto</div>
-                            <div><strong>abrir</strong> → abierto</div>
-                            <div><strong>romper</strong> → roto</div>
-                        </div>
-                    </div>
-
-                    <div class="note">💡 Use for recent past actions with connection to present ("I have eaten")!</div>
-                </div>
-            </div>
-
-            <!-- PLUSCUAMPERFECTO -->
-            <div class="branch" onclick="toggleBranch('pluscuamperfecto')">
-                <div class="branch-header pluscuamperfecto">
-                    <span>PLUSCUAMPERFECTO (Pluperfect)</span>
-                    <span class="toggle-icon" id="icon-pluscuamperfecto">▼</span>
-                </div>
-                <div class="branch-content" id="content-pluscuamperfecto">
-                    <div class="verb-section pluscuamperfecto-border">
-                        <div class="verb-title">Formula: HABER (imperfect) + past participle</div>
-                        <div class="conjugation">
-                            <span class="pronoun">yo</span><span class="verb-form">había hablado/comido/vivido</span>
-                            <span class="pronoun">tú</span><span class="verb-form">habías hablado/comido/vivido</span>
-                            <span class="pronoun">él/ella/usted</span><span class="verb-form">había hablado/comido/vivido</span>
-                            <span class="pronoun">nosotros/as</span><span class="verb-form">habíamos hablado/comido/vivido</span>
-                            <span class="pronoun">vosotros/as</span><span class="verb-form">habíais hablado/comido/vivido</span>
-                            <span class="pronoun">ellos/ellas/ustedes</span><span class="verb-form">habían hablado/comido/vivido</span>
-                        </div>
-                    </div>
-
-                    <div class="verb-section pluscuamperfecto-border">
-                        <div class="verb-title">Example Sentences</div>
-                        <div style="line-height: 1.8; color: #444;">
-                            <strong>Cuando llegué, ella ya había salido.</strong><br>
-                            <em>(When I arrived, she had already left.)</em><br><br>
-                            <strong>Nunca había visto algo así.</strong><br>
-                            <em>(I had never seen anything like that.)</em>
-                        </div>
-                    </div>
-
-                    <div class="note">💡 Use for actions completed before another past action ("had done")!</div>
-                </div>
-            </div>
-
-            <!-- FUTURO -->
-            <div class="branch" onclick="toggleBranch('futuro')">
-                <div class="branch-header futuro">
-                    <span>FUTURO (Future)</span>
-                    <span class="toggle-icon" id="icon-futuro">▼</span>
-                </div>
-                <div class="branch-content" id="content-futuro">
-                    <div class="verb-section futuro-border">
-                        <div class="verb-title">Regular: HABLAR / COMER / VIVIR</div>
-                        <div class="conjugation">
-                            <span class="pronoun">yo</span><span class="verb-form">hablaré / comeré / viviré</span>
-                            <span class="pronoun">tú</span><span class="verb-form">hablarás / comerás / vivirás</span>
-                            <span class="pronoun">él/ella/usted</span><span class="verb-form">hablará / comerá / vivirá</span>
-                            <span class="pronoun">nosotros/as</span><span class="verb-form">hablaremos / comeremos / viviremos</span>
-                            <span class="pronoun">vosotros/as</span><span class="verb-form">hablaréis / comeréis / viviréis</span>
-                            <span class="pronoun">ellos/ellas/ustedes</span><span class="verb-form">hablarán / comerán / vivirán</span>
-                        </div>
-                    </div>
-
-                    <div class="verb-section futuro-border">
-                        <div class="verb-title">Irregular: HACER</div>
-                        <div class="conjugation">
-                            <span class="pronoun">yo</span><span class="verb-form">haré</span>
-                            <span class="pronoun">tú</span><span class="verb-form">harás</span>
-                            <span class="pronoun">él/ella/usted</span><span class="verb-form">hará</span>
-                            <span class="pronoun">nosotros/as</span><span class="verb-form">haremos</span>
-                            <span class="pronoun">vosotros/as</span><span class="verb-form">haréis</span>
-                            <span class="pronoun">ellos/ellas/ustedes</span><span class="verb-form">harán</span>
-                        </div>
-                    </div>
-
-                    <div class="verb-section futuro-border">
-                        <div class="verb-title">Other Common Irregulars</div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0;">
-                            <div><strong>decir</strong> → diré, dirás...</div>
-                            <div><strong>poder</strong> → podré, podrás...</div>
-                            <div><strong>poner</strong> → pondré, pondrás...</div>
-                            <div><strong>querer</strong> → querré, querrás...</div>
-                            <div><strong>saber</strong> → sabré, sabrás...</div>
-                            <div><strong>tener</strong> → tendré, tendrás...</div>
-                            <div><strong>venir</strong> → vendré, vendrás...</div>
-                            <div><strong>salir</strong> → saldré, saldrás...</div>
-                        </div>
-                    </div>
-
-                    <div class="note">💡 Use for future actions, predictions, and suppositions!</div>
-                </div>
-            </div>
-
-            <!-- CONDICIONAL -->
-            <div class="branch" onclick="toggleBranch('condicional')">
-                <div class="branch-header condicional">
-                    <span>CONDICIONAL (Conditional)</span>
-                    <span class="toggle-icon" id="icon-condicional">▼</span>
-                </div>
-                <div class="branch-content" id="content-condicional">
-                    <div class="verb-section condicional-border">
-                        <div class="verb-title">Regular: HABLAR / COMER / VIVIR</div>
-                        <div class="conjugation">
-                            <span class="pronoun">yo</span><span class="verb-form">hablaría / comería / viviría</span>
-                            <span class="pronoun">tú</span><span class="verb-form">hablarías / comerías / vivirías</span>
-                            <span class="pronoun">él/ella/usted</span><span class="verb-form">hablaría / comería / viviría</span>
-                            <span class="pronoun">nosotros/as</span><span class="verb-form">hablaríamos / comeríamos / viviríamos</span>
-                            <span class="pronoun">vosotros/as</span><span class="verb-form">hablaríais / comeríais / viviríais</span>
-                            <span class="pronoun">ellos/ellas/ustedes</span><span class="verb-form">hablarían / comerían / vivirían</span>
-                        </div>
-                    </div>
-
-                    <div class="verb-section condicional-border">
-                        <div class="verb-title">Irregular: HACER</div>
-                        <div class="conjugation">
-                            <span class="pronoun">yo</span><span class="verb-form">haría</span>
-                            <span class="pronoun">tú</span><span class="verb-form">harías</span>
-                            <span class="pronoun">él/ella/usted</span><span class="verb-form">haría</span>
-                            <span class="pronoun">nosotros/as</span><span class="verb-form">haríamos</span>
-                            <span class="pronoun">vosotros/as</span><span class="verb-form">haríais</span>
-                            <span class="pronoun">ellos/ellas/ustedes</span><span class="verb-form">harían</span>
-                        </div>
-                    </div>
-
-                    <div class="verb-section condicional-border">
-                        <div class="verb-title">Other Irregulars (same stems as future!)</div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0;">
-                            <div><strong>decir</strong> → diría, dirías...</div>
-                            <div><strong>poder</strong> → podría, podrías...</div>
-                            <div><strong>poner</strong> → pondría, pondrías...</div>
-                            <div><strong>querer</strong> → querría, querrías...</div>
-                            <div><strong>saber</strong> → sabría, sabrías...</div>
-                            <div><strong>tener</strong> → tendría, tendrías...</div>
-                            <div><strong>venir</strong> → vendría, vendrías...</div>
-                            <div><strong>salir</strong> → saldría, saldrías...</div>
-                        </div>
-                    </div>
-
-                    <div class="note">💡 Use for hypothetical situations, polite requests, and "would" statements! Often paired with Imperfecto de Subjuntivo in "si" clauses!</div>
-                </div>
-            </div>
-
-            <!-- IMPERFECTO DE SUBJUNTIVO -->
-            <div class="branch" onclick="toggleBranch('subjuntivo')">
-                <div class="branch-header subjuntivo">
-                    <span>IMPERFECTO DE SUBJUNTIVO</span>
-                    <span class="toggle-icon" id="icon-subjuntivo">▼</span>
-                </div>
-                <div class="branch-content" id="content-subjuntivo">
-                    <div class="verb-section subjuntivo-border">
-                        <div class="verb-title">How to Form It: Take the 3rd person plural preterite, drop -ron, add endings</div>
-                        <div style="background: rgba(142, 45, 226, 0.1); padding: 15px; border-radius: 10px; margin: 10px 0;">
-                            <strong>Example: HABLAR</strong><br>
-                            ellos hablaron → habla- → hablara/hablase
-                        </div>
-                    </div>
-
-                    <div class="verb-section subjuntivo-border">
-                        <div class="verb-title">Regular -AR: HABLAR (-ra endings)</div>
-                        <div class="conjugation">
-                            <span class="pronoun">yo</span><span class="verb-form">hablara</span>
-                            <span class="pronoun">tú</span><span class="verb-form">hablaras</span>
-                            <span class="pronoun">él/ella/usted</span><span class="verb-form">hablara</span>
-                            <span class="pronoun">nosotros/as</span><span class="verb-form">habláramos</span>
-                            <span class="pronoun">vosotros/as</span><span class="verb-form">hablarais</span>
-                            <span class="pronoun">ellos/ellas/ustedes</span><span class="verb-form">hablaran</span>
-                        </div>
-                        <div style="margin-top: 10px; font-size: 0.9em; color: #666;">
-                            <strong>Alternative -se form:</strong> hablase, hablases, hablase, hablásemos, hablaseis, hablasen
-                        </div>
-                    </div>
-
-                    <div class="verb-section subjuntivo-border">
-                        <div class="verb-title">Regular -ER/-IR: COMER / VIVIR</div>
-                        <div class="conjugation">
-                            <span class="pronoun">yo</span><span class="verb-form">comiera / viviera</span>
-                            <span class="pronoun">tú</span><span class="verb-form">comieras / vivieras</span>
-                            <span class="pronoun">él/ella/usted</span><span class="verb-form">comiera / viviera</span>
-                            <span class="pronoun">nosotros/as</span><span class="verb-form">comiéramos / viviéramos</span>
-                            <span class="pronoun">vosotros/as</span><span class="verb-form">comierais / vivierais</span>
-                            <span class="pronoun">ellos/ellas/ustedes</span><span class="verb-form">comieran / vivieran</span>
-                        </div>
-                    </div>
-
-                    <div class="verb-section subjuntivo-border">
-                        <div class="verb-title">Irregular: SER / IR (fueron → fue-)</div>
-                        <div class="conjugation">
-                            <span class="pronoun">yo</span><span class="verb-form">fuera</span>
-                            <span class="pronoun">tú</span><span class="verb-form">fueras</span>
-                            <span class="pronoun">él/ella/usted</span><span class="verb-form">fuera</span>
-                            <span class="pronoun">nosotros/as</span><span class="verb-form">fuéramos</span>
-                            <span class="pronoun">vosotros/as</span><span class="verb-form">fuerais</span>
-                            <span class="pronoun">ellos/ellas/ustedes</span><span class="verb-form">fueran</span>
-                        </div>
-                    </div>
-
-                    <div class="verb-section subjuntivo-border">
-                        <div class="verb-title">Irregular: TENER (tuvieron → tuvie-)</div>
-                        <div class="conjugation">
-                            <span class="pronoun">yo</span><span class="verb-form">tuviera</span>
-                            <span class="pronoun">tú</span><span class="verb-form">tuvieras</span>
-                            <span class="pronoun">él/ella/usted</span><span class="verb-form">tuviera</span>
-                            <span class="pronoun">nosotros/as</span><span class="verb-form">tuviéramos</span>
-                            <span class="pronoun">vosotros/as</span><span class="verb-form">tuvierais</span>
-                            <span class="pronoun">ellos/ellas/ustedes</span><span class="verb-form">tuvieran</span>
-                        </div>
-                    </div>
-
-                    <div class="verb-section subjuntivo-border">
-                        <div class="verb-title">Other Common Irregular Stems</div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0;">
-                            <div><strong>hacer</strong> → hicieron → hiciera</div>
-                            <div><strong>poder</strong> → pudieron → pudiera</div>
-                            <div><strong>poner</strong> → pusieron → pusiera</div>
-                            <div><strong>querer</strong> → quisieron → quisiera</div>
-                            <div><strong>saber</strong> → supieron → supiera</div>
-                            <div><strong>venir</strong> → vinieron → viniera</div>
-                            <div><strong>decir</strong> → dijeron → dijera</div>
-                            <div><strong>traer</strong> → trajeron → trajera</div>
-                        </div>
-                    </div>
-
-                    <div class="note">💡 Use after certain triggers (si clauses, como si, ojalá) and for hypothetical/contrary-to-fact situations in the past!</div>
-                </div>
-            </div>
-
-            <!-- CONNECTION BOX -->
-            <div class="connection-box">
-                <div class="connection-title">🔗 SUPER IMPORTANT CONNECTION 🔗</div>
-                <div class="connection-title" style="font-size: 1.3em; margin-bottom: 30px;">
-                    Imperfecto de Subjuntivo ↔️ Condicional
-                </div>
-
-                <div class="formula">
-                    📐 THE MAGIC FORMULA:<br>
-                    Si + IMPERFECTO DE SUBJUNTIVO ... CONDICIONAL
-                </div>
-
-                <div class="connection-content">
-                    <div class="connection-card">
-                        <h3>🎯 Pattern 1: "If... then would"</h3>
-                        <div class="example-sentence">
-                            <div class="spanish">Si tuviera dinero, compraría un coche.</div>
-                            <div class="english">If I had money, I would buy a car.</div>
-                        </div>
-                        <div class="example-sentence">
-                            <div class="spanish">Si fuera rico, viajaría por el mundo.</div>
-                            <div class="english">If I were rich, I would travel the world.</div>
-                        </div>
-                        <div class="example-sentence">
-                            <div class="spanish">Si pudiera volar, iría a la luna.</div>
-                            <div class="english">If I could fly, I would go to the moon.</div>
-                        </div>
-                    </div>
-
-                    <div class="connection-card">
-                        <h3>🌟 Pattern 2: "I wish..."</h3>
-                        <div class="example-sentence">
-                            <div class="spanish">Ojalá tuviera más tiempo.</div>
-                            <div class="english">I wish I had more time.</div>
-                        </div>
-                        <div class="example-sentence">
-                            <div class="spanish">Ojalá pudiera ayudarte.</div>
-                            <div class="english">I wish I could help you.</div>
-                        </div>
-                        <div class="example-sentence">
-                            <div class="spanish">Ojalá estuviera en la playa.</div>
-                            <div class="english">I wish I were at the beach.</div>
-                        </div>
-                    </div>
-
-                    <div class="connection-card">
-                        <h3>💭 Pattern 3: "As if..."</h3>
-                        <div class="example-sentence">
-                            <div class="spanish">Habla como si supiera todo.</div>
-                            <div class="english">He talks as if he knew everything.</div>
-                        </div>
-                        <div class="example-sentence">
-                            <div class="spanish">Actúa como si fuera el jefe.</div>
-                            <div class="english">She acts as if she were the boss.</div>
-                        </div>
-                        <div class="example-sentence">
-                            <div class="spanish">Me mira como si no me conociera.</div>
-                            <div class="english">He looks at me as if he didn't know me.</div>
-                        </div>
-                    </div>
-
-                    <div class="connection-card">
-                        <h3>🎪 Pattern 4: Mixed Examples</h3>
-                        <div class="example-sentence">
-                            <div class="spanish">Si yo fuera tú, estudiaría más.</div>
-                            <div class="english">If I were you, I would study more.</div>
-                        </div>
-                        <div class="example-sentence">
-                            <div class="spanish">¿Qué harías si tuvieras un millón de dólares?</div>
-                            <div class="english">What would you do if you had a million dollars?</div>
-                        </div>
-                        <div class="example-sentence">
-                            <div class="spanish">Si lloviera, me quedaría en casa.</div>
-                            <div class="english">If it rained, I would stay home.</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="formula" style="margin-top: 30px; background: rgba(255, 215, 0, 0.3);">
-                    💡 PRO TIP: When you see "Si" + past subjunctive, you KNOW the other half needs conditional!<br>
-                    This is THE most common combo for hypothetical situations!
-                </div>
+    <div id="container">
+        <div id="canvas-wrapper">
+            <div id="canvas">
+                <svg id="lines" xmlns="http://www.w3.org/2000/svg"></svg>
             </div>
         </div>
     </div>
 
     <script>
-        function toggleBranch(tenseId) {
-            const content = document.getElementById(`content-${tenseId}`);
-            const icon = document.getElementById(`icon-${tenseId}`);
-            
-            content.classList.toggle('expanded');
-            icon.classList.toggle('expanded');
+        // Data structure for verbs
+        const verbData = {
+            presente: {
+                regular: {
+                    ar: {
+                        example: 'HABLAR',
+                        conjugations: [
+                            ['yo', 'hablo'],
+                            ['tú', 'hablas'],
+                            ['él/ella/usted', 'habla'],
+                            ['nosotros/as', 'hablamos'],
+                            ['vosotros/as', 'habláis'],
+                            ['ellos/ellas/ustedes', 'hablan']
+                        ]
+                    },
+                    er: {
+                        example: 'COMER',
+                        conjugations: [
+                            ['yo', 'como'],
+                            ['tú', 'comes'],
+                            ['él/ella/usted', 'come'],
+                            ['nosotros/as', 'comemos'],
+                            ['vosotros/as', 'coméis'],
+                            ['ellos/ellas/ustedes', 'comen']
+                        ]
+                    },
+                    ir: {
+                        example: 'VIVIR',
+                        conjugations: [
+                            ['yo', 'vivo'],
+                            ['tú', 'vives'],
+                            ['él/ella/usted', 'vive'],
+                            ['nosotros/as', 'vivimos'],
+                            ['vosotros/as', 'vivís'],
+                            ['ellos/ellas/ustedes', 'viven']
+                        ]
+                    }
+                },
+                irregular: {
+                    ser: {
+                        name: 'SER',
+                        conjugations: [
+                            ['yo', 'soy'],
+                            ['tú', 'eres'],
+                            ['él/ella/usted', 'es'],
+                            ['nosotros/as', 'somos'],
+                            ['vosotros/as', 'sois'],
+                            ['ellos/ellas/ustedes', 'son']
+                        ]
+                    },
+                    estar: {
+                        name: 'ESTAR',
+                        conjugations: [
+                            ['yo', 'estoy'],
+                            ['tú', 'estás'],
+                            ['él/ella/usted', 'está'],
+                            ['nosotros/as', 'estamos'],
+                            ['vosotros/as', 'estáis'],
+                            ['ellos/ellas/ustedes', 'están']
+                        ]
+                    },
+                    hacer: {
+                        name: 'HACER',
+                        conjugations: [
+                            ['yo', 'hago'],
+                            ['tú', 'haces'],
+                            ['él/ella/usted', 'hace'],
+                            ['nosotros/as', 'hacemos'],
+                            ['vosotros/as', 'hacéis'],
+                            ['ellos/ellas/ustedes', 'hacen']
+                        ]
+                    },
+                    ir: {
+                        name: 'IR',
+                        conjugations: [
+                            ['yo', 'voy'],
+                            ['tú', 'vas'],
+                            ['él/ella/usted', 'va'],
+                            ['nosotros/as', 'vamos'],
+                            ['vosotros/as', 'vais'],
+                            ['ellos/ellas/ustedes', 'van']
+                        ]
+                    },
+                    tener: {
+                        name: 'TENER',
+                        conjugations: [
+                            ['yo', 'tengo'],
+                            ['tú', 'tienes'],
+                            ['él/ella/usted', 'tiene'],
+                            ['nosotros/as', 'tenemos'],
+                            ['vosotros/as', 'tenéis'],
+                            ['ellos/ellas/ustedes', 'tienen']
+                        ]
+                    }
+                }
+            }
+        };
+
+        // Canvas state
+        let scale = 1;
+        let translateX = 0;
+        let translateY = 0;
+        let isDragging = false;
+        let startX, startY;
+        let expandedTenses = new Set();
+        let expandedCategories = new Set();
+        let manualControl = false;
+
+        const container = document.getElementById('container');
+        const canvasWrapper = document.getElementById('canvas-wrapper');
+        const canvas = document.getElementById('canvas');
+        const linesContainer = document.getElementById('lines');
+
+        // Center of canvas
+        const CENTER_X = 2000;
+        const CENTER_Y = 2000;
+
+        // Tense names and colors
+        const tenses = [
+            { name: 'PRESENTE', color: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)' },
+            { name: 'PRETÉRITO', color: 'linear-gradient(135deg, #ee0979 0%, #ff6a00 100%)' },
+            { name: 'IMPERFECTO', color: 'linear-gradient(135deg, #fc4a1a 0%, #f7b733 100%)' },
+            { name: 'PRETÉRITO PERFECTO', color: 'linear-gradient(135deg, #4776e6 0%, #8e54e9 100%)' },
+            { name: 'PLUSCUAMPERFECTO', color: 'linear-gradient(135deg, #134e5e 0%, #71b280 100%)' },
+            { name: 'FUTURO', color: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)' },
+            { name: 'CONDICIONAL', color: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)' },
+            { name: 'IMPERFECTO DE SUBJUNTIVO', color: 'linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%)' }
+        ];
+
+        // Dynamic radius calculation
+        function getBaseRadius() {
+            const expandedCount = expandedTenses.size;
+            const categoryCount = expandedCategories.size;
+            return 400 + (expandedCount * 100) + (categoryCount * 50);
         }
 
-        function toggleAll() {
-            const allContents = document.querySelectorAll('.branch-content');
-            const allIcons = document.querySelectorAll('.toggle-icon');
+        function getCategoryRadius() {
+            const categoryCount = expandedCategories.size;
+            return 250 + (categoryCount * 40);
+        }
+
+        function getVerbRadius() {
+            const categoryCount = expandedCategories.size;
+            return 200 + (categoryCount * 30);
+        }
+
+        // Create center node
+        const centerNode = createNode('SPANISH VERBS', CENTER_X, CENTER_Y, 'center-node');
+        canvas.appendChild(centerNode);
+
+        // Store tense nodes for repositioning
+        const tenseNodes = [];
+
+        // Create all tense nodes in a circle around center
+        tenses.forEach((tense, index) => {
+            const angle = (index / tenses.length) * Math.PI * 2 - Math.PI / 2;
+            const radius = getBaseRadius();
+            const x = CENTER_X + Math.cos(angle) * radius;
+            const y = CENTER_Y + Math.sin(angle) * radius;
             
-            // Check if any is expanded
-            const anyExpanded = Array.from(allContents).some(content => 
-                content.classList.contains('expanded')
-            );
+            const tenseNode = createNode(tense.name, x, y, 'tense-node');
+            tenseNode.style.background = tense.color;
+            tenseNode.dataset.tense = tense.name.toLowerCase().replace(/\s+/g, '-');
+            tenseNode.dataset.expanded = 'false';
+            tenseNode.dataset.angle = angle;
             
-            // If any expanded, collapse all. Otherwise expand all.
-            allContents.forEach(content => {
-                if (anyExpanded) {
-                    content.classList.remove('expanded');
-                } else {
-                    content.classList.add('expanded');
-                }
+            tenseNode.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleTenseExpansion(tenseNode);
             });
             
-            allIcons.forEach(icon => {
-                if (anyExpanded) {
-                    icon.classList.remove('expanded');
-                } else {
-                    icon.classList.add('expanded');
-                }
+            canvas.appendChild(tenseNode);
+            
+            // Create line from center to tense
+            const line = drawLine(CENTER_X, CENTER_Y, x, y);
+            line.dataset.lineType = 'tense';
+            line.dataset.tenseId = tenseNode.dataset.tense;
+            
+            tenseNodes.push({
+                node: tenseNode,
+                line: line,
+                angle: angle,
+                tense: tense
+            });
+        });
+
+        // Functions
+        function createNode(text, x, y, className) {
+            const node = document.createElement('div');
+            node.className = `node ${className}`;
+            node.textContent = text;
+            node.style.left = `${x}px`;
+            node.style.top = `${y}px`;
+            node.style.transform = 'translate(-50%, -50%)';
+            
+            return node;
+        }
+
+        function drawLine(x1, y1, x2, y2, parentTense = null, parentCategory = null) {
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', x1);
+            line.setAttribute('y1', y1);
+            line.setAttribute('x2', x2);
+            line.setAttribute('y2', y2);
+            if (parentTense) line.dataset.parentTense = parentTense;
+            if (parentCategory) line.dataset.parentCategory = parentCategory;
+            linesContainer.appendChild(line);
+            return line;
+        }
+
+        function repositionTenses() {
+            const newRadius = getBaseRadius();
+            tenseNodes.forEach(({ node, line, angle }) => {
+                const x = CENTER_X + Math.cos(angle) * newRadius;
+                const y = CENTER_Y + Math.sin(angle) * newRadius;
+                
+                node.style.left = `${x}px`;
+                node.style.top = `${y}px`;
+                
+                line.setAttribute('x2', x);
+                line.setAttribute('y2', y);
             });
         }
 
-        // Optional: Open the first branch by default
-        // toggleBranch('presente');
+        function autoZoom() {
+            if (manualControl) return;
+            
+            const expandedCount = expandedTenses.size + expandedCategories.size;
+            
+            if (expandedCount === 0) {
+                scale = 1;
+            } else if (expandedCount <= 2) {
+                scale = 0.8;
+            } else if (expandedCount <= 5) {
+                scale = 0.6;
+            } else if (expandedCount <= 10) {
+                scale = 0.45;
+            } else {
+                scale = 0.35;
+            }
+            
+            translateX = 0;
+            translateY = 0;
+            updateTransform();
+        }
+
+        function toggleTenseExpansion(tenseNode) {
+            const tenseName = tenseNode.dataset.tense;
+            const isExpanded = tenseNode.dataset.expanded === 'true';
+            const angle = parseFloat(tenseNode.dataset.angle);
+            const radius = getBaseRadius();
+            const tenseX = CENTER_X + Math.cos(angle) * radius;
+            const tenseY = CENTER_Y + Math.sin(angle) * radius;
+
+            if (isExpanded) {
+                // Collapse
+                expandedTenses.delete(tenseName);
+                
+                const childNodes = canvas.querySelectorAll(`[data-parent-tense="${tenseName}"]`);
+                childNodes.forEach(node => {
+                    if (node.dataset.category) {
+                        expandedCategories.delete(`${tenseName}-${node.dataset.category}`);
+                    }
+                    node.remove();
+                });
+                
+                const lines = linesContainer.querySelectorAll(`[data-parent-tense="${tenseName}"]`);
+                lines.forEach(line => line.remove());
+                
+                tenseNode.dataset.expanded = 'false';
+            } else {
+                // Expand
+                expandedTenses.add(tenseName);
+                tenseNode.dataset.expanded = 'true';
+
+                const offsetDistance = getCategoryRadius();
+                const perpAngle1 = angle + Math.PI / 6;
+                const perpAngle2 = angle - Math.PI / 6;
+
+                const regularX = tenseX + Math.cos(perpAngle1) * offsetDistance;
+                const regularY = tenseY + Math.sin(perpAngle1) * offsetDistance;
+                const irregularX = tenseX + Math.cos(perpAngle2) * offsetDistance;
+                const irregularY = tenseY + Math.sin(perpAngle2) * offsetDistance;
+
+                // Create Regular node
+                const regularNode = createNode('REGULAR', regularX, regularY, 'category-node regular-node');
+                regularNode.dataset.category = 'regular';
+                regularNode.dataset.tense = tenseName;
+                regularNode.dataset.parentTense = tenseName;
+                regularNode.dataset.expanded = 'false';
+                regularNode.dataset.baseX = regularX;
+                regularNode.dataset.baseY = regularY;
+                regularNode.dataset.baseAngle = perpAngle1;
+                regularNode.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleCategoryExpansion(regularNode, tenseName, 'regular');
+                });
+                canvas.appendChild(regularNode);
+                const regLine = drawLine(tenseX, tenseY, regularX, regularY, tenseName);
+                regLine.dataset.lineType = 'category';
+
+                // Create Irregular node
+                const irregularNode = createNode('IRREGULAR', irregularX, irregularY, 'category-node irregular-node');
+                irregularNode.dataset.category = 'irregular';
+                irregularNode.dataset.tense = tenseName;
+                irregularNode.dataset.parentTense = tenseName;
+                irregularNode.dataset.expanded = 'false';
+                irregularNode.dataset.baseX = irregularX;
+                irregularNode.dataset.baseY = irregularY;
+                irregularNode.dataset.baseAngle = perpAngle2;
+                irregularNode.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleCategoryExpansion(irregularNode, tenseName, 'irregular');
+                });
+                canvas.appendChild(irregularNode);
+                const irregLine = drawLine(tenseX, tenseY, irregularX, irregularY, tenseName);
+                irregLine.dataset.lineType = 'category';
+            }
+            
+            repositionTenses();
+            autoZoom();
+        }
+
+        function toggleCategoryExpansion(categoryNode, tenseName, category) {
+            const isExpanded = categoryNode.dataset.expanded === 'true';
+            const nodeId = `${tenseName}-${category}`;
+            const catX = parseFloat(categoryNode.dataset.baseX);
+            const catY = parseFloat(categoryNode.dataset.baseY);
+            const baseAngle = parseFloat(categoryNode.dataset.baseAngle);
+
+            if (isExpanded) {
+                // Collapse
+                expandedCategories.delete(nodeId);
+                
+                const childNodes = canvas.querySelectorAll(`[data-parent-category="${nodeId}"]`);
+                childNodes.forEach(node => node.remove());
+                
+                const lines = linesContainer.querySelectorAll(`[data-parent-category="${nodeId}"]`);
+                lines.forEach(line => line.remove());
+                
+                categoryNode.dataset.expanded = 'false';
+            } else {
+                // Expand
+                expandedCategories.add(nodeId);
+                categoryNode.dataset.expanded = 'true';
+
+                if (category === 'regular') {
+                    // Show -AR, -ER, -IR
+                    const endings = ['ar', 'er', 'ir'];
+                    const endingRadius = getVerbRadius();
+                    
+                    endings.forEach((ending, index) => {
+                        const angle = baseAngle + (index - 1) * (Math.PI / 8);
+                        const x = catX + Math.cos(angle) * endingRadius;
+                        const y = catY + Math.sin(angle) * endingRadius;
+                        
+                        const example = verbData.presente.regular[ending].example;
+                        const endingNode = createNode(`-${ending.toUpperCase()}\n(${example})`, x, y, 'ending-node');
+                        endingNode.dataset.ending = ending;
+                        endingNode.dataset.tense = tenseName;
+                        endingNode.dataset.parentTense = tenseName;
+                        endingNode.dataset.parentCategory = nodeId;
+                        endingNode.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            showConjugation(endingNode);
+                        });
+                        canvas.appendChild(endingNode);
+                        drawLine(catX, catY, x, y, tenseName, nodeId);
+                    });
+                } else {
+                    // Show irregular verbs
+                    const irregularVerbs = Object.keys(verbData.presente.irregular);
+                    const verbRadius = getVerbRadius();
+                    
+                    irregularVerbs.forEach((verb, index) => {
+                        const totalVerbs = irregularVerbs.length;
+                        const angle = baseAngle + ((index - (totalVerbs - 1) / 2) * (Math.PI / 12));
+                        const x = catX + Math.cos(angle) * verbRadius;
+                        const y = catY + Math.sin(angle) * verbRadius;
+                        
+                        const verbNode = createNode(verbData.presente.irregular[verb].name, x, y, 'verb-node');
+                        verbNode.dataset.verb = verb;
+                        verbNode.dataset.tense = tenseName;
+                        verbNode.dataset.parentTense = tenseName;
+                        verbNode.dataset.parentCategory = nodeId;
+                        verbNode.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            showConjugation(verbNode);
+                        });
+                        canvas.appendChild(verbNode);
+                        drawLine(catX, catY, x, y, tenseName, nodeId);
+                    });
+                }
+            }
+            
+            repositionTenses();
+            autoZoom();
+        }
+
+        function showConjugation(node) {
+            document.querySelectorAll('.conjugation-box').forEach(box => box.remove());
+
+            let conjugationData = null;
+            let title = '';
+
+            if (node.dataset.ending) {
+                const ending = node.dataset.ending;
+                conjugationData = verbData.presente.regular[ending].conjugations;
+                title = verbData.presente.regular[ending].example;
+            } else if (node.dataset.verb) {
+                const verb = node.dataset.verb;
+                conjugationData = verbData.presente.irregular[verb].conjugations;
+                title = verbData.presente.irregular[verb].name;
+            }
+
+            if (conjugationData) {
+                const box = document.createElement('div');
+                box.className = 'conjugation-box visible';
+                
+                const rect = node.getBoundingClientRect();
+                box.style.left = `${rect.right + 20}px`;
+                box.style.top = `${rect.top}px`;
+
+                let html = `
+                    <button class="close-btn" onclick="this.parentElement.remove()">×</button>
+                    <h3>${title}</h3>
+                    <div class="conjugation-list">
+                `;
+
+                conjugationData.forEach(([pronoun, form]) => {
+                    html += `
+                        <span class="pronoun">${pronoun}</span>
+                        <span class="verb-form">${form}</span>
+                    `;
+                });
+
+                html += '</div>';
+                box.innerHTML = html;
+                document.body.appendChild(box);
+            }
+        }
+
+        function updateTransform() {
+            canvasWrapper.style.transform = `translate(calc(-50% + ${translateX}px), calc(-50% + ${translateY}px)) scale(${scale})`;
+        }
+
+        function zoomIn() {
+            scale = Math.min(scale * 1.2, 3);
+            manualControl = true;
+            updateTransform();
+        }
+
+        function zoomOut() {
+            scale = Math.max(scale / 1.2, 0.2);
+            manualControl = true;
+            updateTransform();
+        }
+
+        function resetView() {
+            scale = 1;
+            translateX = 0;
+            translateY = 0;
+            manualControl = false;
+            updateTransform();
+            autoZoom();
+        }
+
+        // Dragging
+        container.addEventListener('mousedown', (e) => {
+            if (e.target === container || e.target === canvasWrapper || e.target === canvas || e.target.tagName === 'svg') {
+                isDragging = true;
+                startX = e.clientX - translateX;
+                startY = e.clientY - translateY;
+                container.classList.add('dragging');
+            }
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                translateX = e.clientX - startX;
+                translateY = e.clientY - startY;
+                updateTransform();
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (isDragging) {
+                manualControl = true;
+            }
+            isDragging = false;
+            container.classList.remove('dragging');
+        });
+
+        // Zoom with mouse wheel
+        container.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? 0.9 : 1.1;
+            scale = Math.max(0.2, Math.min(3, scale * delta));
+            manualControl = true;
+            updateTransform();
+        });
+
+        // Touch support for mobile
+        let touchStartDist = 0;
+        
+        container.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 2) {
+                touchStartDist = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+            } else if (e.touches.length === 1) {
+                isDragging = true;
+                startX = e.touches[0].clientX - translateX;
+                startY = e.touches[0].clientY - translateY;
+            }
+        });
+
+        container.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (e.touches.length === 2 && touchStartDist > 0) {
+                const dist = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+                scale = Math.max(0.2, Math.min(3, scale * (dist / touchStartDist)));
+                touchStartDist = dist;
+                manualControl = true;
+                updateTransform();
+            } else if (e.touches.length === 1 && isDragging) {
+                translateX = e.touches[0].clientX - startX;
+                translateY = e.touches[0].clientY - startY;
+                updateTransform();
+            }
+        });
+
+        container.addEventListener('touchend', () => {
+            if (isDragging || touchStartDist > 0) {
+                manualControl = true;
+            }
+            isDragging = false;
+            touchStartDist = 0;
+        });
     </script>
 </body>
 </html>
