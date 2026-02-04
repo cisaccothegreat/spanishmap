@@ -44,8 +44,8 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 4000px;
-            height: 4000px;
+            width: 6000px;
+            height: 6000px;
             transform: translate(-50%, -50%);
         }
 
@@ -64,7 +64,6 @@
             stroke-width: 2;
         }
 
-        /* Controls */
         .controls {
             position: fixed;
             top: 20px;
@@ -96,7 +95,6 @@
             transform: scale(1.1);
         }
 
-        /* Title */
         .title {
             position: fixed;
             top: 20px;
@@ -111,7 +109,6 @@
             background-clip: text;
         }
 
-        /* Node styles */
         .node {
             position: absolute;
             padding: 15px 25px;
@@ -133,7 +130,6 @@
             z-index: 20;
         }
 
-        /* Center node */
         .center-node {
             font-size: 1.8em;
             padding: 30px 50px;
@@ -146,12 +142,10 @@
             justify-content: center;
         }
 
-        /* Tense nodes */
         .tense-node {
-            font-size: 1.3em;
+            font-size: 1.2em;
         }
 
-        /* Category nodes (Regular/Irregular) */
         .category-node {
             font-size: 1.1em;
         }
@@ -164,20 +158,17 @@
             background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
         }
 
-        /* Verb ending nodes */
         .ending-node {
             font-size: 1em;
             background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
         }
 
-        /* Irregular verb nodes */
         .verb-node {
             font-size: 0.95em;
             background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
             color: #333;
         }
 
-        /* Conjugation detail box */
         .conjugation-box {
             position: fixed;
             background: rgba(20, 20, 20, 0.95);
@@ -235,7 +226,6 @@
             background: rgba(255, 255, 255, 0.3);
         }
 
-        /* Instructions */
         .instructions {
             position: fixed;
             bottom: 20px;
@@ -292,104 +282,119 @@
         </div>
     </div>
 
+    <script src="data:text/javascript;base64,Ly8gVmVyYiBkYXRhIHdpbGwgYmUgaW5qZWN0ZWQgaGVyZQ=="></script>
     <script>
-        // Data structure for verbs
+        // VERB DATA - Complete conjugations for all tenses
         const verbData = {
             presente: {
                 regular: {
-                    ar: {
-                        example: 'HABLAR',
-                        conjugations: [
-                            ['yo', 'hablo'],
-                            ['tú', 'hablas'],
-                            ['él/ella/usted', 'habla'],
-                            ['nosotros/as', 'hablamos'],
-                            ['vosotros/as', 'habláis'],
-                            ['ellos/ellas/ustedes', 'hablan']
-                        ]
-                    },
-                    er: {
-                        example: 'COMER',
-                        conjugations: [
-                            ['yo', 'como'],
-                            ['tú', 'comes'],
-                            ['él/ella/usted', 'come'],
-                            ['nosotros/as', 'comemos'],
-                            ['vosotros/as', 'coméis'],
-                            ['ellos/ellas/ustedes', 'comen']
-                        ]
-                    },
-                    ir: {
-                        example: 'VIVIR',
-                        conjugations: [
-                            ['yo', 'vivo'],
-                            ['tú', 'vives'],
-                            ['él/ella/usted', 'vive'],
-                            ['nosotros/as', 'vivimos'],
-                            ['vosotros/as', 'vivís'],
-                            ['ellos/ellas/ustedes', 'viven']
-                        ]
-                    }
+                    ar: { example: 'HABLAR', conjugations: [['yo', 'hablo'], ['tú', 'hablas'], ['él/ella/usted', 'habla'], ['nosotros/as', 'hablamos'], ['vosotros/as', 'habláis'], ['ellos/ellas/ustedes', 'hablan']] },
+                    er: { example: 'COMER', conjugations: [['yo', 'como'], ['tú', 'comes'], ['él/ella/usted', 'come'], ['nosotros/as', 'comemos'], ['vosotros/as', 'coméis'], ['ellos/ellas/ustedes', 'comen']] },
+                    ir: { example: 'VIVIR', conjugations: [['yo', 'vivo'], ['tú', 'vives'], ['él/ella/usted', 'vive'], ['nosotros/as', 'vivimos'], ['vosotros/as', 'vivís'], ['ellos/ellas/ustedes', 'viven']] }
                 },
                 irregular: {
-                    ser: {
-                        name: 'SER',
-                        conjugations: [
-                            ['yo', 'soy'],
-                            ['tú', 'eres'],
-                            ['él/ella/usted', 'es'],
-                            ['nosotros/as', 'somos'],
-                            ['vosotros/as', 'sois'],
-                            ['ellos/ellas/ustedes', 'son']
-                        ]
-                    },
-                    estar: {
-                        name: 'ESTAR',
-                        conjugations: [
-                            ['yo', 'estoy'],
-                            ['tú', 'estás'],
-                            ['él/ella/usted', 'está'],
-                            ['nosotros/as', 'estamos'],
-                            ['vosotros/as', 'estáis'],
-                            ['ellos/ellas/ustedes', 'están']
-                        ]
-                    },
-                    hacer: {
-                        name: 'HACER',
-                        conjugations: [
-                            ['yo', 'hago'],
-                            ['tú', 'haces'],
-                            ['él/ella/usted', 'hace'],
-                            ['nosotros/as', 'hacemos'],
-                            ['vosotros/as', 'hacéis'],
-                            ['ellos/ellas/ustedes', 'hacen']
-                        ]
-                    },
-                    ir: {
-                        name: 'IR',
-                        conjugations: [
-                            ['yo', 'voy'],
-                            ['tú', 'vas'],
-                            ['él/ella/usted', 'va'],
-                            ['nosotros/as', 'vamos'],
-                            ['vosotros/as', 'vais'],
-                            ['ellos/ellas/ustedes', 'van']
-                        ]
-                    },
-                    tener: {
-                        name: 'TENER',
-                        conjugations: [
-                            ['yo', 'tengo'],
-                            ['tú', 'tienes'],
-                            ['él/ella/usted', 'tiene'],
-                            ['nosotros/as', 'tenemos'],
-                            ['vosotros/as', 'tenéis'],
-                            ['ellos/ellas/ustedes', 'tienen']
-                        ]
-                    }
+                    ser: { name: 'SER', conjugations: [['yo', 'soy'], ['tú', 'eres'], ['él/ella/usted', 'es'], ['nosotros/as', 'somos'], ['vosotros/as', 'sois'], ['ellos/ellas/ustedes', 'son']] },
+                    estar: { name: 'ESTAR', conjugations: [['yo', 'estoy'], ['tú', 'estás'], ['él/ella/usted', 'está'], ['nosotros/as', 'estamos'], ['vosotros/as', 'estáis'], ['ellos/ellas/ustedes', 'están']] },
+                    hacer: { name: 'HACER', conjugations: [['yo', 'hago'], ['tú', 'haces'], ['él/ella/usted', 'hace'], ['nosotros/as', 'hacemos'], ['vosotros/as', 'hacéis'], ['ellos/ellas/ustedes', 'hacen']] },
+                    ir: { name: 'IR', conjugations: [['yo', 'voy'], ['tú', 'vas'], ['él/ella/usted', 'va'], ['nosotros/as', 'vamos'], ['vosotros/as', 'vais'], ['ellos/ellas/ustedes', 'van']] },
+                    tener: { name: 'TENER', conjugations: [['yo', 'tengo'], ['tú', 'tienes'], ['él/ella/usted', 'tiene'], ['nosotros/as', 'tenemos'], ['vosotros/as', 'tenéis'], ['ellos/ellas/ustedes', 'tienen']] }
+                }
+            },
+            pretérito: {
+                regular: {
+                    ar: { example: 'HABLAR', conjugations: [['yo', 'hablé'], ['tú', 'hablaste'], ['él/ella/usted', 'habló'], ['nosotros/as', 'hablamos'], ['vosotros/as', 'hablasteis'], ['ellos/ellas/ustedes', 'hablaron']] },
+                    er: { example: 'COMER', conjugations: [['yo', 'comí'], ['tú', 'comiste'], ['él/ella/usted', 'comió'], ['nosotros/as', 'comimos'], ['vosotros/as', 'comisteis'], ['ellos/ellas/ustedes', 'comieron']] },
+                    ir: { example: 'VIVIR', conjugations: [['yo', 'viví'], ['tú', 'viviste'], ['él/ella/usted', 'vivió'], ['nosotros/as', 'vivimos'], ['vosotros/as', 'vivisteis'], ['ellos/ellas/ustedes', 'vivieron']] }
+                },
+                irregular: {
+                    ser: { name: 'SER/IR', conjugations: [['yo', 'fui'], ['tú', 'fuiste'], ['él/ella/usted', 'fue'], ['nosotros/as', 'fuimos'], ['vosotros/as', 'fuisteis'], ['ellos/ellas/ustedes', 'fueron']] },
+                    estar: { name: 'ESTAR', conjugations: [['yo', 'estuve'], ['tú', 'estuviste'], ['él/ella/usted', 'estuvo'], ['nosotros/as', 'estuvimos'], ['vosotros/as', 'estuvisteis'], ['ellos/ellas/ustedes', 'estuvieron']] },
+                    hacer: { name: 'HACER', conjugations: [['yo', 'hice'], ['tú', 'hiciste'], ['él/ella/usted', 'hizo'], ['nosotros/as', 'hicimos'], ['vosotros/as', 'hicisteis'], ['ellos/ellas/ustedes', 'hicieron']] },
+                    tener: { name: 'TENER', conjugations: [['yo', 'tuve'], ['tú', 'tuviste'], ['él/ella/usted', 'tuvo'], ['nosotros/as', 'tuvimos'], ['vosotros/as', 'tuvisteis'], ['ellos/ellas/ustedes', 'tuvieron']] },
+                    poder: { name: 'PODER', conjugations: [['yo', 'pude'], ['tú', 'pudiste'], ['él/ella/usted', 'pudo'], ['nosotros/as', 'pudimos'], ['vosotros/as', 'pudisteis'], ['ellos/ellas/ustedes', 'pudieron']] }
+                }
+            },
+            imperfecto: {
+                regular: {
+                    ar: { example: 'HABLAR', conjugations: [['yo', 'hablaba'], ['tú', 'hablabas'], ['él/ella/usted', 'hablaba'], ['nosotros/as', 'hablábamos'], ['vosotros/as', 'hablabais'], ['ellos/ellas/ustedes', 'hablaban']] },
+                    er: { example: 'COMER', conjugations: [['yo', 'comía'], ['tú', 'comías'], ['él/ella/usted', 'comía'], ['nosotros/as', 'comíamos'], ['vosotros/as', 'comíais'], ['ellos/ellas/ustedes', 'comían']] },
+                    ir: { example: 'VIVIR', conjugations: [['yo', 'vivía'], ['tú', 'vivías'], ['él/ella/usted', 'vivía'], ['nosotros/as', 'vivíamos'], ['vosotros/as', 'vivíais'], ['ellos/ellas/ustedes', 'vivían']] }
+                },
+                irregular: {
+                    ser: { name: 'SER', conjugations: [['yo', 'era'], ['tú', 'eras'], ['él/ella/usted', 'era'], ['nosotros/as', 'éramos'], ['vosotros/as', 'erais'], ['ellos/ellas/ustedes', 'eran']] },
+                    ir: { name: 'IR', conjugations: [['yo', 'iba'], ['tú', 'ibas'], ['él/ella/usted', 'iba'], ['nosotros/as', 'íbamos'], ['vosotros/as', 'ibais'], ['ellos/ellas/ustedes', 'iban']] },
+                    ver: { name: 'VER', conjugations: [['yo', 'veía'], ['tú', 'veías'], ['él/ella/usted', 'veía'], ['nosotros/as', 'veíamos'], ['vosotros/as', 'veíais'], ['ellos/ellas/ustedes', 'veían']] }
+                }
+            },
+            futuro: {
+                regular: {
+                    ar: { example: 'HABLAR', conjugations: [['yo', 'hablaré'], ['tú', 'hablarás'], ['él/ella/usted', 'hablará'], ['nosotros/as', 'hablaremos'], ['vosotros/as', 'hablaréis'], ['ellos/ellas/ustedes', 'hablarán']] },
+                    er: { example: 'COMER', conjugations: [['yo', 'comeré'], ['tú', 'comerás'], ['él/ella/usted', 'comerá'], ['nosotros/as', 'comeremos'], ['vosotros/as', 'comeréis'], ['ellos/ellas/ustedes', 'comerán']] },
+                    ir: { example: 'VIVIR', conjugations: [['yo', 'viviré'], ['tú', 'vivirás'], ['él/ella/usted', 'vivirá'], ['nosotros/as', 'viviremos'], ['vosotros/as', 'viviréis'], ['ellos/ellas/ustedes', 'vivirán']] }
+                },
+                irregular: {
+                    hacer: { name: 'HACER', conjugations: [['yo', 'haré'], ['tú', 'harás'], ['él/ella/usted', 'hará'], ['nosotros/as', 'haremos'], ['vosotros/as', 'haréis'], ['ellos/ellas/ustedes', 'harán']] },
+                    tener: { name: 'TENER', conjugations: [['yo', 'tendré'], ['tú', 'tendrás'], ['él/ella/usted', 'tendrá'], ['nosotros/as', 'tendremos'], ['vosotros/as', 'tendréis'], ['ellos/ellas/ustedes', 'tendrán']] },
+                    poder: { name: 'PODER', conjugations: [['yo', 'podré'], ['tú', 'podrás'], ['él/ella/usted', 'podrá'], ['nosotros/as', 'podremos'], ['vosotros/as', 'podréis'], ['ellos/ellas/ustedes', 'podrán']] },
+                    decir: { name: 'DECIR', conjugations: [['yo', 'diré'], ['tú', 'dirás'], ['él/ella/usted', 'dirá'], ['nosotros/as', 'diremos'], ['vosotros/as', 'diréis'], ['ellos/ellas/ustedes', 'dirán']] },
+                    poner: { name: 'PONER', conjugations: [['yo', 'pondré'], ['tú', 'pondrás'], ['él/ella/usted', 'pondrá'], ['nosotros/as', 'pondremos'], ['vosotros/as', 'pondréis'], ['ellos/ellas/ustedes', 'pondrán']] }
+                }
+            },
+            condicional: {
+                regular: {
+                    ar: { example: 'HABLAR', conjugations: [['yo', 'hablaría'], ['tú', 'hablarías'], ['él/ella/usted', 'hablaría'], ['nosotros/as', 'hablaríamos'], ['vosotros/as', 'hablaríais'], ['ellos/ellas/ustedes', 'hablarían']] },
+                    er: { example: 'COMER', conjugations: [['yo', 'comería'], ['tú', 'comerías'], ['él/ella/usted', 'comería'], ['nosotros/as', 'comeríamos'], ['vosotros/as', 'comeríais'], ['ellos/ellas/ustedes', 'comerían']] },
+                    ir: { example: 'VIVIR', conjugations: [['yo', 'viviría'], ['tú', 'vivirías'], ['él/ella/usted', 'viviría'], ['nosotros/as', 'viviríamos'], ['vosotros/as', 'viviríais'], ['ellos/ellas/ustedes', 'vivirían']] }
+                },
+                irregular: {
+                    hacer: { name: 'HACER', conjugations: [['yo', 'haría'], ['tú', 'harías'], ['él/ella/usted', 'haría'], ['nosotros/as', 'haríamos'], ['vosotros/as', 'haríais'], ['ellos/ellas/ustedes', 'harían']] },
+                    tener: { name: 'TENER', conjugations: [['yo', 'tendría'], ['tú', 'tendrías'], ['él/ella/usted', 'tendría'], ['nosotros/as', 'tendríamos'], ['vosotros/as', 'tendríais'], ['ellos/ellas/ustedes', 'tendrían']] },
+                    poder: { name: 'PODER', conjugations: [['yo', 'podría'], ['tú', 'podrías'], ['él/ella/usted', 'podría'], ['nosotros/as', 'podríamos'], ['vosotros/as', 'podríais'], ['ellos/ellas/ustedes', 'podrían']] },
+                    decir: { name: 'DECIR', conjugations: [['yo', 'diría'], ['tú', 'dirías'], ['él/ella/usted', 'diría'], ['nosotros/as', 'diríamos'], ['vosotros/as', 'diríais'], ['ellos/ellas/ustedes', 'dirían']] },
+                    poner: { name: 'PONER', conjugations: [['yo', 'pondría'], ['tú', 'pondrías'], ['él/ella/usted', 'pondría'], ['nosotros/as', 'pondríamos'], ['vosotros/as', 'pondríais'], ['ellos/ellas/ustedes', 'pondrían']] }
+                }
+            },
+            'imperfecto-de-subjuntivo': {
+                regular: {
+                    ar: { example: 'HABLAR', conjugations: [['yo', 'hablara'], ['tú', 'hablaras'], ['él/ella/usted', 'hablara'], ['nosotros/as', 'habláramos'], ['vosotros/as', 'hablarais'], ['ellos/ellas/ustedes', 'hablaran']] },
+                    er: { example: 'COMER', conjugations: [['yo', 'comiera'], ['tú', 'comieras'], ['él/ella/usted', 'comiera'], ['nosotros/as', 'comiéramos'], ['vosotros/as', 'comierais'], ['ellos/ellas/ustedes', 'comieran']] },
+                    ir: { example: 'VIVIR', conjugations: [['yo', 'viviera'], ['tú', 'vivieras'], ['él/ella/usted', 'viviera'], ['nosotros/as', 'viviéramos'], ['vosotros/as', 'vivierais'], ['ellos/ellas/ustedes', 'vivieran']] }
+                },
+                irregular: {
+                    ser: { name: 'SER/IR', conjugations: [['yo', 'fuera'], ['tú', 'fueras'], ['él/ella/usted', 'fuera'], ['nosotros/as', 'fuéramos'], ['vosotros/as', 'fuerais'], ['ellos/ellas/ustedes', 'fueran']] },
+                    tener: { name: 'TENER', conjugations: [['yo', 'tuviera'], ['tú', 'tuvieras'], ['él/ella/usted', 'tuviera'], ['nosotros/as', 'tuviéramos'], ['vosotros/as', 'tuvierais'], ['ellos/ellas/ustedes', 'tuvieran']] },
+                    hacer: { name: 'HACER', conjugations: [['yo', 'hiciera'], ['tú', 'hicieras'], ['él/ella/usted', 'hiciera'], ['nosotros/as', 'hiciéramos'], ['vosotros/as', 'hicierais'], ['ellos/ellas/ustedes', 'hicieran']] },
+                    poder: { name: 'PODER', conjugations: [['yo', 'pudiera'], ['tú', 'pudieras'], ['él/ella/usted', 'pudiera'], ['nosotros/as', 'pudiéramos'], ['vosotros/as', 'pudierais'], ['ellos/ellas/ustedes', 'pudieran']] }
+                }
+            },
+            'pretérito-perfecto': {
+                regular: {
+                    ar: { example: 'HABLAR', conjugations: [['yo', 'he hablado'], ['tú', 'has hablado'], ['él/ella/usted', 'ha hablado'], ['nosotros/as', 'hemos hablado'], ['vosotros/as', 'habéis hablado'], ['ellos/ellas/ustedes', 'han hablado']] },
+                    er: { example: 'COMER', conjugations: [['yo', 'he comido'], ['tú', 'has comido'], ['él/ella/usted', 'ha comido'], ['nosotros/as', 'hemos comido'], ['vosotros/as', 'habéis comido'], ['ellos/ellas/ustedes', 'han comido']] },
+                    ir: { example: 'VIVIR', conjugations: [['yo', 'he vivido'], ['tú', 'has vivido'], ['él/ella/usted', 'ha vivido'], ['nosotros/as', 'hemos vivido'], ['vosotros/as', 'habéis vivido'], ['ellos/ellas/ustedes', 'han vivido']] }
+                },
+                irregular: {
+                    hacer: { name: 'HACER', conjugations: [['yo', 'he hecho'], ['tú', 'has hecho'], ['él/ella/usted', 'ha hecho'], ['nosotros/as', 'hemos hecho'], ['vosotros/as', 'habéis hecho'], ['ellos/ellas/ustedes', 'han hecho']] },
+                    ver: { name: 'VER', conjugations: [['yo', 'he visto'], ['tú', 'has visto'], ['él/ella/usted', 'ha visto'], ['nosotros/as', 'hemos visto'], ['vosotros/as', 'habéis visto'], ['ellos/ellas/ustedes', 'han visto']] },
+                    escribir: { name: 'ESCRIBIR', conjugations: [['yo', 'he escrito'], ['tú', 'has escrito'], ['él/ella/usted', 'ha escrito'], ['nosotros/as', 'hemos escrito'], ['vosotros/as', 'habéis escrito'], ['ellos/ellas/ustedes', 'han escrito']] }
+                }
+            },
+            pluscuamperfecto: {
+                regular: {
+                    ar: { example: 'HABLAR', conjugations: [['yo', 'había hablado'], ['tú', 'habías hablado'], ['él/ella/usted', 'había hablado'], ['nosotros/as', 'habíamos hablado'], ['vosotros/as', 'habíais hablado'], ['ellos/ellas/ustedes', 'habían hablado']] },
+                    er: { example: 'COMER', conjugations: [['yo', 'había comido'], ['tú', 'habías comido'], ['él/ella/usted', 'había comido'], ['nosotros/as', 'habíamos comido'], ['vosotros/as', 'habíais comido'], ['ellos/ellas/ustedes', 'habían comido']] },
+                    ir: { example: 'VIVIR', conjugations: [['yo', 'había vivido'], ['tú', 'habías vivido'], ['él/ella/usted', 'había vivido'], ['nosotros/as', 'habíamos vivido'], ['vosotros/as', 'habíais vivido'], ['ellos/ellas/ustedes', 'habían vivido']] }
+                },
+                irregular: {
+                    hacer: { name: 'HACER', conjugations: [['yo', 'había hecho'], ['tú', 'habías hecho'], ['él/ella/usted', 'había hecho'], ['nosotros/as', 'habíamos hecho'], ['vosotros/as', 'habíais hecho'], ['ellos/ellas/ustedes', 'habían hecho']] },
+                    ver: { name: 'VER', conjugations: [['yo', 'había visto'], ['tú', 'habías visto'], ['él/ella/usted', 'había visto'], ['nosotros/as', 'habíamos visto'], ['vosotros/as', 'habíais visto'], ['ellos/ellas/ustedes', 'habían visto']] }
                 }
             }
         };
+
+        // Constants
+        const CENTER_X = 3000;
+        const CENTER_Y = 3000;
 
         // Canvas state
         let scale = 1;
@@ -397,8 +402,6 @@
         let translateY = 0;
         let isDragging = false;
         let startX, startY;
-        let expandedTenses = new Set();
-        let expandedCategories = new Set();
         let manualControl = false;
 
         const container = document.getElementById('container');
@@ -406,335 +409,358 @@
         const canvas = document.getElementById('canvas');
         const linesContainer = document.getElementById('lines');
 
-        // Center of canvas
-        const CENTER_X = 2000;
-        const CENTER_Y = 2000;
-
-        // Tense names and colors
+        // Tenses configuration
         const tenses = [
-            { name: 'PRESENTE', color: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)' },
-            { name: 'PRETÉRITO', color: 'linear-gradient(135deg, #ee0979 0%, #ff6a00 100%)' },
-            { name: 'IMPERFECTO', color: 'linear-gradient(135deg, #fc4a1a 0%, #f7b733 100%)' },
-            { name: 'PRETÉRITO PERFECTO', color: 'linear-gradient(135deg, #4776e6 0%, #8e54e9 100%)' },
-            { name: 'PLUSCUAMPERFECTO', color: 'linear-gradient(135deg, #134e5e 0%, #71b280 100%)' },
-            { name: 'FUTURO', color: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)' },
-            { name: 'CONDICIONAL', color: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)' },
-            { name: 'IMPERFECTO DE SUBJUNTIVO', color: 'linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%)' }
+            { name: 'PRESENTE', key: 'presente', color: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)' },
+            { name: 'PRETÉRITO', key: 'pretérito', color: 'linear-gradient(135deg, #ee0979 0%, #ff6a00 100%)' },
+            { name: 'IMPERFECTO', key: 'imperfecto', color: 'linear-gradient(135deg, #fc4a1a 0%, #f7b733 100%)' },
+            { name: 'PRETÉRITO PERFECTO', key: 'pretérito-perfecto', color: 'linear-gradient(135deg, #4776e6 0%, #8e54e9 100%)' },
+            { name: 'PLUSCUAMPERFECTO', key: 'pluscuamperfecto', color: 'linear-gradient(135deg, #134e5e 0%, #71b280 100%)' },
+            { name: 'FUTURO', key: 'futuro', color: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)' },
+            { name: 'CONDICIONAL', key: 'condicional', color: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)' },
+            { name: 'IMPERFECTO DE SUBJUNTIVO', key: 'imperfecto-de-subjuntivo', color: 'linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%)' }
         ];
 
-        // Dynamic radius calculation
-        function getBaseRadius() {
-            const expandedCount = expandedTenses.size;
-            const categoryCount = expandedCategories.size;
-            return 400 + (expandedCount * 100) + (categoryCount * 50);
-        }
+        // Node registry to track all nodes and their lines
+        const nodeRegistry = {};
+        let nodeIdCounter = 0;
 
-        function getCategoryRadius() {
-            const categoryCount = expandedCategories.size;
-            return 250 + (categoryCount * 40);
-        }
-
-        function getVerbRadius() {
-            const categoryCount = expandedCategories.size;
-            return 200 + (categoryCount * 30);
-        }
-
-        // Create center node
-        const centerNode = createNode('SPANISH VERBS', CENTER_X, CENTER_Y, 'center-node');
-        canvas.appendChild(centerNode);
-
-        // Store tense nodes for repositioning
-        const tenseNodes = [];
-
-        // Create all tense nodes in a circle around center
-        tenses.forEach((tense, index) => {
-            const angle = (index / tenses.length) * Math.PI * 2 - Math.PI / 2;
-            const radius = getBaseRadius();
-            const x = CENTER_X + Math.cos(angle) * radius;
-            const y = CENTER_Y + Math.sin(angle) * radius;
-            
-            const tenseNode = createNode(tense.name, x, y, 'tense-node');
-            tenseNode.style.background = tense.color;
-            tenseNode.dataset.tense = tense.name.toLowerCase().replace(/\s+/g, '-');
-            tenseNode.dataset.expanded = 'false';
-            tenseNode.dataset.angle = angle;
-            
-            tenseNode.addEventListener('click', (e) => {
-                e.stopPropagation();
-                toggleTenseExpansion(tenseNode);
-            });
-            
-            canvas.appendChild(tenseNode);
-            
-            // Create line from center to tense
-            const line = drawLine(CENTER_X, CENTER_Y, x, y);
-            line.dataset.lineType = 'tense';
-            line.dataset.tenseId = tenseNode.dataset.tense;
-            
-            tenseNodes.push({
-                node: tenseNode,
-                line: line,
-                angle: angle,
-                tense: tense
-            });
-        });
-
-        // Functions
-        function createNode(text, x, y, className) {
+        // CORE FUNCTIONS
+        function createNode(text, x, y, className, data = {}) {
+            const id = `node-${nodeIdCounter++}`;
             const node = document.createElement('div');
             node.className = `node ${className}`;
             node.textContent = text;
             node.style.left = `${x}px`;
             node.style.top = `${y}px`;
             node.style.transform = 'translate(-50%, -50%)';
+            node.dataset.nodeId = id;
             
-            return node;
+            Object.assign(node.dataset, data);
+            
+            nodeRegistry[id] = {
+                element: node,
+                x, y,
+                children: [],
+                lines: [],
+                data
+            };
+            
+            canvas.appendChild(node);
+            return { id, element: node };
         }
 
-        function drawLine(x1, y1, x2, y2, parentTense = null, parentCategory = null) {
+        function createLine(parentId, childId) {
+            const parent = nodeRegistry[parentId];
+            const child = nodeRegistry[childId];
+            
             const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            line.setAttribute('x1', x1);
-            line.setAttribute('y1', y1);
-            line.setAttribute('x2', x2);
-            line.setAttribute('y2', y2);
-            if (parentTense) line.dataset.parentTense = parentTense;
-            if (parentCategory) line.dataset.parentCategory = parentCategory;
+            line.setAttribute('x1', parent.x);
+            line.setAttribute('y1', parent.y);
+            line.setAttribute('x2', child.x);
+            line.setAttribute('y2', child.y);
+            line.dataset.parentId = parentId;
+            line.dataset.childId = childId;
+            
             linesContainer.appendChild(line);
+            
+            parent.children.push(childId);
+            parent.lines.push(line);
+            
             return line;
         }
 
-        function repositionTenses() {
-            const newRadius = getBaseRadius();
-            tenseNodes.forEach(({ node, line, angle }) => {
-                const x = CENTER_X + Math.cos(angle) * newRadius;
-                const y = CENTER_Y + Math.sin(angle) * newRadius;
-                
-                node.style.left = `${x}px`;
-                node.style.top = `${y}px`;
-                
-                line.setAttribute('x2', x);
-                line.setAttribute('y2', y);
+        function updateNodePosition(nodeId, x, y) {
+            const node = nodeRegistry[nodeId];
+            node.x = x;
+            node.y = y;
+            node.element.style.left = `${x}px`;
+            node.element.style.top = `${y}px`;
+            
+            // Update all lines where this node is parent
+            node.lines.forEach(line => {
+                line.setAttribute('x1', x);
+                line.setAttribute('y1', y);
+            });
+            
+            // Update all lines where this node is child
+            Object.values(nodeRegistry).forEach(otherNode => {
+                otherNode.lines.forEach(line => {
+                    if (line.dataset.childId === nodeId) {
+                        line.setAttribute('x2', x);
+                        line.setAttribute('y2', y);
+                    }
+                });
             });
         }
 
-        function autoZoom() {
-            if (manualControl) return;
+        function removeNodeAndChildren(nodeId) {
+            const node = nodeRegistry[nodeId];
+            if (!node) return;
             
-            const expandedCount = expandedTenses.size + expandedCategories.size;
+            // Recursively remove all children first
+            const childrenCopy = [...node.children];
+            childrenCopy.forEach(childId => removeNodeAndChildren(childId));
             
-            if (expandedCount === 0) {
-                scale = 1;
-            } else if (expandedCount <= 2) {
-                scale = 0.8;
-            } else if (expandedCount <= 5) {
-                scale = 0.6;
-            } else if (expandedCount <= 10) {
-                scale = 0.45;
-            } else {
-                scale = 0.35;
-            }
+            // Remove all lines connected to this node
+            node.lines.forEach(line => {
+                if (line && line.parentNode) {
+                    line.remove();
+                }
+            });
             
-            translateX = 0;
-            translateY = 0;
-            updateTransform();
-        }
-
-        function toggleTenseExpansion(tenseNode) {
-            const tenseName = tenseNode.dataset.tense;
-            const isExpanded = tenseNode.dataset.expanded === 'true';
-            const angle = parseFloat(tenseNode.dataset.angle);
-            const radius = getBaseRadius();
-            const tenseX = CENTER_X + Math.cos(angle) * radius;
-            const tenseY = CENTER_Y + Math.sin(angle) * radius;
-
-            if (isExpanded) {
-                // Collapse
-                expandedTenses.delete(tenseName);
+            // Remove lines where this node is a child
+            Object.values(nodeRegistry).forEach(otherNode => {
+                if (otherNode.lines) {
+                    otherNode.lines = otherNode.lines.filter(line => {
+                        if (line.dataset.childId === nodeId) {
+                            if (line.parentNode) line.remove();
+                            return false;
+                        }
+                        return true;
+                    });
+                }
                 
-                const childNodes = canvas.querySelectorAll(`[data-parent-tense="${tenseName}"]`);
-                childNodes.forEach(node => {
-                    if (node.dataset.category) {
-                        expandedCategories.delete(`${tenseName}-${node.dataset.category}`);
+                // Remove from children array
+                if (otherNode.children) {
+                    const index = otherNode.children.indexOf(nodeId);
+                    if (index > -1) {
+                        otherNode.children.splice(index, 1);
                     }
-                    node.remove();
-                });
-                
-                const lines = linesContainer.querySelectorAll(`[data-parent-tense="${tenseName}"]`);
-                lines.forEach(line => line.remove());
-                
-                tenseNode.dataset.expanded = 'false';
-            } else {
-                // Expand
-                expandedTenses.add(tenseName);
-                tenseNode.dataset.expanded = 'true';
-
-                const offsetDistance = getCategoryRadius();
-                const perpAngle1 = angle + Math.PI / 6;
-                const perpAngle2 = angle - Math.PI / 6;
-
-                const regularX = tenseX + Math.cos(perpAngle1) * offsetDistance;
-                const regularY = tenseY + Math.sin(perpAngle1) * offsetDistance;
-                const irregularX = tenseX + Math.cos(perpAngle2) * offsetDistance;
-                const irregularY = tenseY + Math.sin(perpAngle2) * offsetDistance;
-
-                // Create Regular node
-                const regularNode = createNode('REGULAR', regularX, regularY, 'category-node regular-node');
-                regularNode.dataset.category = 'regular';
-                regularNode.dataset.tense = tenseName;
-                regularNode.dataset.parentTense = tenseName;
-                regularNode.dataset.expanded = 'false';
-                regularNode.dataset.baseX = regularX;
-                regularNode.dataset.baseY = regularY;
-                regularNode.dataset.baseAngle = perpAngle1;
-                regularNode.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    toggleCategoryExpansion(regularNode, tenseName, 'regular');
-                });
-                canvas.appendChild(regularNode);
-                const regLine = drawLine(tenseX, tenseY, regularX, regularY, tenseName);
-                regLine.dataset.lineType = 'category';
-
-                // Create Irregular node
-                const irregularNode = createNode('IRREGULAR', irregularX, irregularY, 'category-node irregular-node');
-                irregularNode.dataset.category = 'irregular';
-                irregularNode.dataset.tense = tenseName;
-                irregularNode.dataset.parentTense = tenseName;
-                irregularNode.dataset.expanded = 'false';
-                irregularNode.dataset.baseX = irregularX;
-                irregularNode.dataset.baseY = irregularY;
-                irregularNode.dataset.baseAngle = perpAngle2;
-                irregularNode.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    toggleCategoryExpansion(irregularNode, tenseName, 'irregular');
-                });
-                canvas.appendChild(irregularNode);
-                const irregLine = drawLine(tenseX, tenseY, irregularX, irregularY, tenseName);
-                irregLine.dataset.lineType = 'category';
+                }
+            });
+            
+            // Remove the DOM element
+            if (node.element && node.element.parentNode) {
+                node.element.remove();
             }
             
-            repositionTenses();
-            autoZoom();
+            // Remove from registry
+            delete nodeRegistry[nodeId];
         }
 
-        function toggleCategoryExpansion(categoryNode, tenseName, category) {
-            const isExpanded = categoryNode.dataset.expanded === 'true';
-            const nodeId = `${tenseName}-${category}`;
-            const catX = parseFloat(categoryNode.dataset.baseX);
-            const catY = parseFloat(categoryNode.dataset.baseY);
-            const baseAngle = parseFloat(categoryNode.dataset.baseAngle);
+        // CREATE INITIAL STRUCTURE
+        const centerNode = createNode('SPANISH\nTENSES', CENTER_X, CENTER_Y, 'center-node', { type: 'center', allVisible: 'true' });
+        
+        centerNode.element.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleAllTenses();
+        });
 
+        const tenseRadius = 500;
+        const tenseNodesArray = [];
+        
+        tenses.forEach((tense, index) => {
+            const angle = (index / tenses.length) * Math.PI * 2 - Math.PI / 2;
+            const x = CENTER_X + Math.cos(angle) * tenseRadius;
+            const y = CENTER_Y + Math.sin(angle) * tenseRadius;
+            
+            const tenseNode = createNode(tense.name, x, y, 'tense-node', {
+                type: 'tense',
+                tenseKey: tense.key,
+                angle: angle,
+                expanded: 'false'
+            });
+            
+            tenseNode.element.style.background = tense.color;
+            tenseNode.element.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleTense(tenseNode.id);
+            });
+            
+            const line = createLine(centerNode.id, tenseNode.id);
+            line.dataset.tenseId = tenseNode.id;
+            
+            tenseNodesArray.push({ nodeId: tenseNode.id, lineElement: line });
+        });
+
+        function toggleAllTenses() {
+            const centerData = nodeRegistry[centerNode.id];
+            const allVisible = centerData.data.allVisible === 'true';
+            
+            if (allVisible) {
+                // Hide all tenses
+                tenseNodesArray.forEach(({ nodeId, lineElement }) => {
+                    const node = nodeRegistry[nodeId];
+                    if (node) {
+                        node.element.style.display = 'none';
+                        lineElement.style.display = 'none';
+                    }
+                });
+                centerData.data.allVisible = 'false';
+            } else {
+                // Show all tenses
+                tenseNodesArray.forEach(({ nodeId, lineElement }) => {
+                    const node = nodeRegistry[nodeId];
+                    if (node) {
+                        node.element.style.display = 'block';
+                        lineElement.style.display = 'block';
+                    }
+                });
+                centerData.data.allVisible = 'true';
+            }
+        }
+
+        function toggleTense(tenseNodeId) {
+            const tenseNode = nodeRegistry[tenseNodeId];
+            if (!tenseNode) return;
+            
+            const isExpanded = tenseNode.data.expanded === 'true';
+            
             if (isExpanded) {
-                // Collapse
-                expandedCategories.delete(nodeId);
-                
-                const childNodes = canvas.querySelectorAll(`[data-parent-category="${nodeId}"]`);
-                childNodes.forEach(node => node.remove());
-                
-                const lines = linesContainer.querySelectorAll(`[data-parent-category="${nodeId}"]`);
-                lines.forEach(line => line.remove());
-                
-                categoryNode.dataset.expanded = 'false';
+                // Collapse - remove all children
+                const childrenToRemove = [...tenseNode.children];
+                childrenToRemove.forEach(childId => removeNodeAndChildren(childId));
+                tenseNode.data.expanded = 'false';
             } else {
                 // Expand
-                expandedCategories.add(nodeId);
-                categoryNode.dataset.expanded = 'true';
+                tenseNode.data.expanded = 'true';
+                const angle = parseFloat(tenseNode.data.angle);
+                const categoryRadius = 400; // Increased from 300
+                
+                // Create REGULAR and IRREGULAR nodes with wider angle
+                const regularAngle = angle + Math.PI / 6;
+                const irregularAngle = angle - Math.PI / 6;
+                
+                const regularX = tenseNode.x + Math.cos(regularAngle) * categoryRadius;
+                const regularY = tenseNode.y + Math.sin(regularAngle) * categoryRadius;
+                const irregularX = tenseNode.x + Math.cos(irregularAngle) * categoryRadius;
+                const irregularY = tenseNode.y + Math.sin(irregularAngle) * categoryRadius;
+                
+                const regularNode = createNode('REGULAR', regularX, regularY, 'category-node regular-node', {
+                    type: 'category',
+                    category: 'regular',
+                    tenseKey: tenseNode.data.tenseKey,
+                    parentTense: tenseNodeId,
+                    baseAngle: regularAngle,
+                    expanded: 'false'
+                });
+                
+                const irregularNode = createNode('IRREGULAR', irregularX, irregularY, 'category-node irregular-node', {
+                    type: 'category',
+                    category: 'irregular',
+                    tenseKey: tenseNode.data.tenseKey,
+                    parentTense: tenseNodeId,
+                    baseAngle: irregularAngle,
+                    expanded: 'false'
+                });
+                
+                createLine(tenseNodeId, regularNode.id);
+                createLine(tenseNodeId, irregularNode.id);
+                
+                regularNode.element.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleCategory(regularNode.id);
+                });
+                
+                irregularNode.element.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleCategory(irregularNode.id);
+                });
+            }
+        }
 
-                if (category === 'regular') {
-                    // Show -AR, -ER, -IR
-                    const endings = ['ar', 'er', 'ir'];
-                    const endingRadius = getVerbRadius();
-                    
-                    endings.forEach((ending, index) => {
-                        const angle = baseAngle + (index - 1) * (Math.PI / 8);
-                        const x = catX + Math.cos(angle) * endingRadius;
-                        const y = catY + Math.sin(angle) * endingRadius;
+        function toggleCategory(categoryNodeId) {
+            const catNode = nodeRegistry[categoryNodeId];
+            if (!catNode) return;
+            
+            const isExpanded = catNode.data.expanded === 'true';
+            
+            if (isExpanded) {
+                // Collapse - remove all children
+                const childrenToRemove = [...catNode.children];
+                childrenToRemove.forEach(childId => removeNodeAndChildren(childId));
+                catNode.data.expanded = 'false';
+            } else {
+                catNode.data.expanded = 'true';
+                const baseAngle = parseFloat(catNode.data.baseAngle);
+                const verbRadius = 300; // Increased from 250
+                const tenseKey = catNode.data.tenseKey;
+                const tenseData = verbData[tenseKey];
+                
+                if (catNode.data.category === 'regular') {
+                    // Show -AR, -ER, -IR with more spacing
+                    ['ar', 'er', 'ir'].forEach((ending, index) => {
+                        const angle = baseAngle + (index - 1) * (Math.PI / 5); // Wider angle
+                        const x = catNode.x + Math.cos(angle) * verbRadius;
+                        const y = catNode.y + Math.sin(angle) * verbRadius;
                         
-                        const example = verbData.presente.regular[ending].example;
-                        const endingNode = createNode(`-${ending.toUpperCase()}\n(${example})`, x, y, 'ending-node');
-                        endingNode.dataset.ending = ending;
-                        endingNode.dataset.tense = tenseName;
-                        endingNode.dataset.parentTense = tenseName;
-                        endingNode.dataset.parentCategory = nodeId;
-                        endingNode.addEventListener('click', (e) => {
+                        const endingNode = createNode(
+                            `-${ending.toUpperCase()}\n(${tenseData.regular[ending].example})`,
+                            x, y, 'ending-node',
+                            { type: 'ending', ending, tenseKey, category: 'regular' }
+                        );
+                        
+                        createLine(categoryNodeId, endingNode.id);
+                        
+                        endingNode.element.addEventListener('click', (e) => {
                             e.stopPropagation();
-                            showConjugation(endingNode);
+                            showConjugation(endingNode.id);
                         });
-                        canvas.appendChild(endingNode);
-                        drawLine(catX, catY, x, y, tenseName, nodeId);
                     });
                 } else {
-                    // Show irregular verbs
-                    const irregularVerbs = Object.keys(verbData.presente.irregular);
-                    const verbRadius = getVerbRadius();
-                    
+                    // Show irregular verbs with much wider spacing
+                    const irregularVerbs = Object.keys(tenseData.irregular);
                     irregularVerbs.forEach((verb, index) => {
                         const totalVerbs = irregularVerbs.length;
-                        const angle = baseAngle + ((index - (totalVerbs - 1) / 2) * (Math.PI / 12));
-                        const x = catX + Math.cos(angle) * verbRadius;
-                        const y = catY + Math.sin(angle) * verbRadius;
+                        const angleSpread = Math.PI / 2.5; // Even wider spread
+                        const angle = baseAngle + ((index - (totalVerbs - 1) / 2) * (angleSpread / Math.max(totalVerbs - 1, 1)));
+                        const x = catNode.x + Math.cos(angle) * verbRadius;
+                        const y = catNode.y + Math.sin(angle) * verbRadius;
                         
-                        const verbNode = createNode(verbData.presente.irregular[verb].name, x, y, 'verb-node');
-                        verbNode.dataset.verb = verb;
-                        verbNode.dataset.tense = tenseName;
-                        verbNode.dataset.parentTense = tenseName;
-                        verbNode.dataset.parentCategory = nodeId;
-                        verbNode.addEventListener('click', (e) => {
+                        const verbNode = createNode(
+                            tenseData.irregular[verb].name,
+                            x, y, 'verb-node',
+                            { type: 'verb', verb, tenseKey, category: 'irregular' }
+                        );
+                        
+                        createLine(categoryNodeId, verbNode.id);
+                        
+                        verbNode.element.addEventListener('click', (e) => {
                             e.stopPropagation();
-                            showConjugation(verbNode);
+                            showConjugation(verbNode.id);
                         });
-                        canvas.appendChild(verbNode);
-                        drawLine(catX, catY, x, y, tenseName, nodeId);
                     });
                 }
             }
-            
-            repositionTenses();
-            autoZoom();
         }
 
-        function showConjugation(node) {
+        function showConjugation(nodeId) {
             document.querySelectorAll('.conjugation-box').forEach(box => box.remove());
-
-            let conjugationData = null;
-            let title = '';
-
-            if (node.dataset.ending) {
-                const ending = node.dataset.ending;
-                conjugationData = verbData.presente.regular[ending].conjugations;
-                title = verbData.presente.regular[ending].example;
-            } else if (node.dataset.verb) {
-                const verb = node.dataset.verb;
-                conjugationData = verbData.presente.irregular[verb].conjugations;
-                title = verbData.presente.irregular[verb].name;
+            
+            const node = nodeRegistry[nodeId];
+            const tenseKey = node.data.tenseKey;
+            const tenseData = verbData[tenseKey];
+            
+            let conjugationData, title;
+            
+            if (node.data.ending) {
+                conjugationData = tenseData.regular[node.data.ending].conjugations;
+                title = tenseData.regular[node.data.ending].example;
+            } else if (node.data.verb) {
+                conjugationData = tenseData.irregular[node.data.verb].conjugations;
+                title = tenseData.irregular[node.data.verb].name;
             }
-
+            
             if (conjugationData) {
                 const box = document.createElement('div');
                 box.className = 'conjugation-box visible';
                 
-                const rect = node.getBoundingClientRect();
+                const rect = node.element.getBoundingClientRect();
                 box.style.left = `${rect.right + 20}px`;
                 box.style.top = `${rect.top}px`;
-
-                let html = `
-                    <button class="close-btn" onclick="this.parentElement.remove()">×</button>
-                    <h3>${title}</h3>
-                    <div class="conjugation-list">
-                `;
-
+                
+                let html = `<button class="close-btn" onclick="this.parentElement.remove()">×</button><h3>${title}</h3><div class="conjugation-list">`;
                 conjugationData.forEach(([pronoun, form]) => {
-                    html += `
-                        <span class="pronoun">${pronoun}</span>
-                        <span class="verb-form">${form}</span>
-                    `;
+                    html += `<span class="pronoun">${pronoun}</span><span class="verb-form">${form}</span>`;
                 });
-
                 html += '</div>';
                 box.innerHTML = html;
                 document.body.appendChild(box);
             }
         }
 
+        // CONTROLS
         function updateTransform() {
             canvasWrapper.style.transform = `translate(calc(-50% + ${translateX}px), calc(-50% + ${translateY}px)) scale(${scale})`;
         }
@@ -757,10 +783,9 @@
             translateY = 0;
             manualControl = false;
             updateTransform();
-            autoZoom();
         }
 
-        // Dragging
+        // DRAGGING
         container.addEventListener('mousedown', (e) => {
             if (e.target === container || e.target === canvasWrapper || e.target === canvas || e.target.tagName === 'svg') {
                 isDragging = true;
@@ -779,14 +804,11 @@
         });
 
         document.addEventListener('mouseup', () => {
-            if (isDragging) {
-                manualControl = true;
-            }
+            if (isDragging) manualControl = true;
             isDragging = false;
             container.classList.remove('dragging');
         });
 
-        // Zoom with mouse wheel
         container.addEventListener('wheel', (e) => {
             e.preventDefault();
             const delta = e.deltaY > 0 ? 0.9 : 1.1;
@@ -795,15 +817,11 @@
             updateTransform();
         });
 
-        // Touch support for mobile
+        // TOUCH SUPPORT
         let touchStartDist = 0;
-        
         container.addEventListener('touchstart', (e) => {
             if (e.touches.length === 2) {
-                touchStartDist = Math.hypot(
-                    e.touches[0].clientX - e.touches[1].clientX,
-                    e.touches[0].clientY - e.touches[1].clientY
-                );
+                touchStartDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
             } else if (e.touches.length === 1) {
                 isDragging = true;
                 startX = e.touches[0].clientX - translateX;
@@ -814,10 +832,7 @@
         container.addEventListener('touchmove', (e) => {
             e.preventDefault();
             if (e.touches.length === 2 && touchStartDist > 0) {
-                const dist = Math.hypot(
-                    e.touches[0].clientX - e.touches[1].clientX,
-                    e.touches[0].clientY - e.touches[1].clientY
-                );
+                const dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
                 scale = Math.max(0.2, Math.min(3, scale * (dist / touchStartDist)));
                 touchStartDist = dist;
                 manualControl = true;
@@ -830,9 +845,7 @@
         });
 
         container.addEventListener('touchend', () => {
-            if (isDragging || touchStartDist > 0) {
-                manualControl = true;
-            }
+            if (isDragging || touchStartDist > 0) manualControl = true;
             isDragging = false;
             touchStartDist = 0;
         });
