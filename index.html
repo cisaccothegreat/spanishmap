@@ -395,14 +395,18 @@
         // Constants
         const CENTER_X = 3000;
         const CENTER_Y = 3000;
+        const BASE_TENSE_RADIUS = 600;
+        const BASE_CATEGORY_RADIUS = 450;
+        const BASE_VERB_RADIUS = 350;
 
         // Canvas state
-        let scale = 1;
+        let scale = 0.8; // Start zoomed out a bit
         let translateX = 0;
         let translateY = 0;
         let isDragging = false;
         let startX, startY;
         let manualControl = false;
+        let expandedCount = 0;
 
         const container = document.getElementById('container');
         const canvasWrapper = document.getElementById('canvas-wrapper');
@@ -424,6 +428,39 @@
         // Node registry to track all nodes and their lines
         const nodeRegistry = {};
         let nodeIdCounter = 0;
+
+        // Dynamic radius calculation
+        function getTenseRadius() {
+            return BASE_TENSE_RADIUS + (expandedCount * 80);
+        }
+
+        function getCategoryRadius() {
+            return BASE_CATEGORY_RADIUS + (expandedCount * 40);
+        }
+
+        function getVerbRadius() {
+            return BASE_VERB_RADIUS + (expandedCount * 30);
+        }
+
+        function autoZoom() {
+            if (manualControl) return;
+            
+            if (expandedCount === 0) {
+                scale = 0.8;
+            } else if (expandedCount <= 3) {
+                scale = 0.6;
+            } else if (expandedCount <= 6) {
+                scale = 0.45;
+            } else if (expandedCount <= 10) {
+                scale = 0.35;
+            } else {
+                scale = 0.25;
+            }
+            
+            translateX = 0;
+            translateY = 0;
+            updateTransform();
+        }
 
         // CORE FUNCTIONS
         function createNode(text, x, y, className, data = {}) {
@@ -547,7 +584,7 @@
             toggleAllTenses();
         });
 
-        const tenseRadius = 500;
+        const tenseRadius = BASE_TENSE_RADIUS;
         const tenseNodesArray = [];
         
         tenses.forEach((tense, index) => {
@@ -571,8 +608,94 @@
             const line = createLine(centerNode.id, tenseNode.id);
             line.dataset.tenseId = tenseNode.id;
             
-            tenseNodesArray.push({ nodeId: tenseNode.id, lineElement: line });
+            tenseNodesArray.push({ nodeId: tenseNode.id, lineElement: line, angle: angle });
         });
+
+        function repositionAllTenses() {
+            const newRadius = getTenseRadius();
+            
+            tenseNodesArray.forEach(({ nodeId, angle }) => {
+                const node = nodeRegistry[nodeId];
+                if (!node) return;
+                
+                const x = CENTER_X + Math.cos(angle) * newRadius;
+                const y = CENTER_Y + Math.sin(angle) * newRadius;
+                
+                updateNodePosition(nodeId, x, y);
+                
+                // Reposition categories if this tense is expanded
+                if (node.data.expanded === 'true') {
+                    repositionTenseChildren(nodeId);
+                }
+            });
+        }
+
+        function repositionTenseChildren(tenseNodeId) {
+            const tenseNode = nodeRegistry[tenseNodeId];
+            if (!tenseNode || tenseNode.data.expanded !== 'true') return;
+            
+            const angle = parseFloat(tenseNode.data.angle);
+            const categoryRadius = getCategoryRadius();
+            
+            const regularAngle = angle + Math.PI / 6;
+            const irregularAngle = angle - Math.PI / 6;
+            
+            // Find and reposition REGULAR and IRREGULAR nodes
+            tenseNode.children.forEach(childId => {
+                const childNode = nodeRegistry[childId];
+                if (!childNode) return;
+                
+                if (childNode.data.category === 'regular') {
+                    const x = tenseNode.x + Math.cos(regularAngle) * categoryRadius;
+                    const y = tenseNode.y + Math.sin(regularAngle) * categoryRadius;
+                    updateNodePosition(childId, x, y);
+                    childNode.data.baseAngle = regularAngle;
+                    
+                    // Reposition verb children if expanded
+                    if (childNode.data.expanded === 'true') {
+                        repositionCategoryChildren(childId);
+                    }
+                } else if (childNode.data.category === 'irregular') {
+                    const x = tenseNode.x + Math.cos(irregularAngle) * categoryRadius;
+                    const y = tenseNode.y + Math.sin(irregularAngle) * categoryRadius;
+                    updateNodePosition(childId, x, y);
+                    childNode.data.baseAngle = irregularAngle;
+                    
+                    // Reposition verb children if expanded
+                    if (childNode.data.expanded === 'true') {
+                        repositionCategoryChildren(childId);
+                    }
+                }
+            });
+        }
+
+        function repositionCategoryChildren(categoryNodeId) {
+            const catNode = nodeRegistry[categoryNodeId];
+            if (!catNode || catNode.data.expanded !== 'true') return;
+            
+            const baseAngle = parseFloat(catNode.data.baseAngle);
+            const verbRadius = getVerbRadius();
+            const tenseKey = catNode.data.tenseKey;
+            const tenseData = verbData[tenseKey];
+            
+            if (catNode.data.category === 'regular') {
+                catNode.children.forEach((childId, index) => {
+                    const angle = baseAngle + (index - 1) * (Math.PI / 5);
+                    const x = catNode.x + Math.cos(angle) * verbRadius;
+                    const y = catNode.y + Math.sin(angle) * verbRadius;
+                    updateNodePosition(childId, x, y);
+                });
+            } else {
+                const totalVerbs = catNode.children.length;
+                catNode.children.forEach((childId, index) => {
+                    const angleSpread = Math.PI / 2.5;
+                    const angle = baseAngle + ((index - (totalVerbs - 1) / 2) * (angleSpread / Math.max(totalVerbs - 1, 1)));
+                    const x = catNode.x + Math.cos(angle) * verbRadius;
+                    const y = catNode.y + Math.sin(angle) * verbRadius;
+                    updateNodePosition(childId, x, y);
+                });
+            }
+        }
 
         function toggleAllTenses() {
             const centerData = nodeRegistry[centerNode.id];
@@ -610,13 +733,22 @@
             if (isExpanded) {
                 // Collapse - remove all children
                 const childrenToRemove = [...tenseNode.children];
-                childrenToRemove.forEach(childId => removeNodeAndChildren(childId));
+                childrenToRemove.forEach(childId => {
+                    const child = nodeRegistry[childId];
+                    if (child && child.data.expanded === 'true') {
+                        expandedCount--;
+                    }
+                    removeNodeAndChildren(childId);
+                });
                 tenseNode.data.expanded = 'false';
+                expandedCount--;
             } else {
                 // Expand
                 tenseNode.data.expanded = 'true';
+                expandedCount++;
+                
                 const angle = parseFloat(tenseNode.data.angle);
-                const categoryRadius = 400; // Increased from 300
+                const categoryRadius = getCategoryRadius();
                 
                 // Create REGULAR and IRREGULAR nodes with wider angle
                 const regularAngle = angle + Math.PI / 6;
@@ -658,6 +790,10 @@
                     toggleCategory(irregularNode.id);
                 });
             }
+            
+            // Reposition everything
+            repositionAllTenses();
+            autoZoom();
         }
 
         function toggleCategory(categoryNodeId) {
@@ -671,17 +807,20 @@
                 const childrenToRemove = [...catNode.children];
                 childrenToRemove.forEach(childId => removeNodeAndChildren(childId));
                 catNode.data.expanded = 'false';
+                expandedCount--;
             } else {
                 catNode.data.expanded = 'true';
+                expandedCount++;
+                
                 const baseAngle = parseFloat(catNode.data.baseAngle);
-                const verbRadius = 300; // Increased from 250
+                const verbRadius = getVerbRadius();
                 const tenseKey = catNode.data.tenseKey;
                 const tenseData = verbData[tenseKey];
                 
                 if (catNode.data.category === 'regular') {
                     // Show -AR, -ER, -IR with more spacing
                     ['ar', 'er', 'ir'].forEach((ending, index) => {
-                        const angle = baseAngle + (index - 1) * (Math.PI / 5); // Wider angle
+                        const angle = baseAngle + (index - 1) * (Math.PI / 5);
                         const x = catNode.x + Math.cos(angle) * verbRadius;
                         const y = catNode.y + Math.sin(angle) * verbRadius;
                         
@@ -703,7 +842,7 @@
                     const irregularVerbs = Object.keys(tenseData.irregular);
                     irregularVerbs.forEach((verb, index) => {
                         const totalVerbs = irregularVerbs.length;
-                        const angleSpread = Math.PI / 2.5; // Even wider spread
+                        const angleSpread = Math.PI / 2.5;
                         const angle = baseAngle + ((index - (totalVerbs - 1) / 2) * (angleSpread / Math.max(totalVerbs - 1, 1)));
                         const x = catNode.x + Math.cos(angle) * verbRadius;
                         const y = catNode.y + Math.sin(angle) * verbRadius;
@@ -723,6 +862,10 @@
                     });
                 }
             }
+            
+            // Reposition everything
+            repositionAllTenses();
+            autoZoom();
         }
 
         function showConjugation(nodeId) {
@@ -747,8 +890,37 @@
                 box.className = 'conjugation-box visible';
                 
                 const rect = node.element.getBoundingClientRect();
-                box.style.left = `${rect.right + 20}px`;
-                box.style.top = `${rect.top}px`;
+                const viewportWidth = window.innerWidth;
+                const viewportHeight = window.innerHeight;
+                
+                // Position popup - try right first, then left if no space
+                let left = rect.right + 20;
+                let top = rect.top;
+                
+                // Check if popup would go off right edge
+                if (left + 300 > viewportWidth) {
+                    left = rect.left - 320; // Position to left instead
+                }
+                
+                // Check if popup would go off left edge
+                if (left < 10) {
+                    left = 10;
+                }
+                
+                // Check if popup would go off bottom
+                if (top + 400 > viewportHeight) {
+                    top = viewportHeight - 420;
+                }
+                
+                // Check if popup would go off top
+                if (top < 10) {
+                    top = 10;
+                }
+                
+                box.style.left = `${left}px`;
+                box.style.top = `${top}px`;
+                box.style.maxHeight = `${viewportHeight - 40}px`;
+                box.style.overflowY = 'auto';
                 
                 let html = `<button class="close-btn" onclick="this.parentElement.remove()">×</button><h3>${title}</h3><div class="conjugation-list">`;
                 conjugationData.forEach(([pronoun, form]) => {
